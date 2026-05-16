@@ -1,0 +1,32 @@
+SECTOR_MAP = {
+    # Consumer Discretionary
+    "MRP": "Consumer Discretionary", "TFG": "Consumer Discretionary",
+    "CPI": "Consumer Discretionary", "TRU": "Consumer Discretionary",
+    # Consumer Staples
+    "SHP": "Consumer Staples", "PIK": "Consumer Staples",
+    "WHL": "Consumer Staples", "DCP": "Consumer Staples",
+    # Financials
+    "SBK": "Financials", "FSR": "Financials", "NED": "Financials",
+    "ABG": "Financials", "DSY": "Financials", "SLM": "Financials",
+    # Resources
+    "AGL": "Resources", "BHP": "Resources", "SOL": "Resources",
+    "SAP": "Resources", "SSW": "Resources", "IMP": "Resources",
+    "GFI": "Resources", "HAR": "Resources", "AMS": "Resources",
+    # Industrials
+    "BTI": "Industrials", "APN": "Industrials", "JSE": "Industrials",
+    # Technology
+    "NPN": "Technology", "PRX": "Technology",
+    # Telecommunications
+    "MTN": "Telecommunications", "VOD": "Telecommunications",
+}
+
+
+def compute_sector_exposure(weights: dict) -> list[dict]:
+    exposure: dict[str, float] = {}
+    for ticker, weight in weights.items():
+        sector = SECTOR_MAP.get(ticker.replace(".JO", ""), "Other")
+        exposure[sector] = exposure.get(sector, 0) + weight
+    return [
+        {"sector": s, "weight": round(w, 4)}
+        for s, w in sorted(exposure.items(), key=lambda x: -x[1])
+    ]
