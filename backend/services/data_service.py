@@ -6,39 +6,58 @@ import os
 TIMEOUT = int(os.getenv("YFINANCE_TIMEOUT", "20"))
 
 
-async def fetch_prices(tickers: list[str], period: str = "3y") -> tuple[pd.DataFrame, list[str]]:
-    formatted = [f"{t}.JO" for t in tickers]
-    loop = asyncio.get_running_loop()
-    raw = await loop.run_in_executor(
-        None,
-        lambda: yf.download(formatted, period=period, auto_adjust=True,
-                             progress=False, timeout=TIMEOUT)
-    )
-    prices = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) else raw
-    min_rows = int(len(prices) * 0.95)
-    clean = prices.dropna(thresh=min_rows, axis=1).dropna()
-    dropped = [t for t in tickers if f"{t}.JO" not in clean.columns]
-
-    if clean.shape[1] < 3:
+def _fetch_ticker_history(formatted_ticker: str, period: str) -> pd.Series:
+    """
+    Fetch close prices for a single ticker using Ticker.history().
+    More reliable than yf.download() on cloud servers where Yahoo Finance
+    rate-limits bulk download requests.
+    """
+    ticker_obj = yf.Ticker(formatted_ticker)
+    hist = ticker_obj.history(period=period, timeout=TIMEOUT)
+    if hist.empty:
+        raise ValueError(f"No data returned for {formatted_ticker}.")
+    close = hist["Close"].dropna()
+    if len(close) < 50:
         raise ValueError(
-            f"Only {clean.shape[1]} ticker(s) have sufficient data after cleaning. "
+            f"{formatted_ticker.replace('.JO', '')} has insufficient history (< 50 rows)."
+        )
+    return close
+
+
+async def fetch_prices(tickers: list[str], period: str = "3y") -> tuple[pd.DataFrame, list[str]]:
+    loop = asyncio.get_running_loop()
+    formatted = [f"{t}.JO" for t in tickers]
+
+    # Fetch all tickers concurrently
+    tasks = [
+        loop.run_in_executor(None, _fetch_ticker_history, ft, period)
+        for ft in formatted
+    ]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    prices_dict = {}
+    dropped = []
+    for ticker, ft, result in zip(tickers, formatted, results):
+        if isinstance(result, Exception):
+            dropped.append(ticker)
+        else:
+            prices_dict[ft] = result
+
+    if len(prices_dict) < 3:
+        raise ValueError(
+            f"Only {len(prices_dict)} ticker(s) have sufficient data. "
             f"Need at least 3. Dropped: {dropped}"
         )
+
+    clean = pd.DataFrame(prices_dict).dropna()
     return clean, dropped
 
 
 async def fetch_single(ticker: str, period: str = "3y") -> pd.Series:
-    formatted = f"{ticker}.JO"
     loop = asyncio.get_running_loop()
-    raw = await loop.run_in_executor(
-        None,
-        lambda: yf.download(formatted, period=period, auto_adjust=True,
-                             progress=False, timeout=TIMEOUT)
+    return await loop.run_in_executor(
+        None, _fetch_ticker_history, f"{ticker}.JO", period
     )
-    close = raw["Close"] if "Close" in raw.columns else raw.iloc[:, 0]
-    if close.dropna().shape[0] < 50:
-        raise ValueError(f"{ticker} has insufficient history (< 50 rows).")
-    return close.dropna()
 
 
 async def validate_ticker(ticker: str) -> dict:
