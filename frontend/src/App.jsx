@@ -6,6 +6,7 @@ import { StageOutput } from './components/StageOutput';
 import { ColdStartBanner } from './components/ColdStartBanner';
 import { useOptimizer } from './hooks/useOptimizer';
 import { useRfRate } from './hooks/useRfRate';
+import { DEFAULT_MAX_WEIGHT, DEFAULT_PERIOD, DEFAULT_ESTIMATOR, DEFAULT_N_SIMS } from './lib/constants';
 
 export default function App() {
   const [tickers, setTickers] = useState([]);
@@ -13,17 +14,27 @@ export default function App() {
   const { rfData } = useRfRate();
   const { optimize, logs, result, status } = useOptimizer();
 
+  // Lifted parameters state
+  const [rfOverride, setRfOverride] = useState(null);
+  const [period, setPeriod] = useState(DEFAULT_PERIOD);
+  const [maxWeight, setMaxWeight] = useState(DEFAULT_MAX_WEIGHT);
+  const [estimator, setEstimator] = useState(DEFAULT_ESTIMATOR);
+  const [nSims, setNSims] = useState(DEFAULT_N_SIMS);
+
   const handleOptimize = async () => {
-    const paramsEl = document.getElementById('compute-params');
-    const params = paramsEl ? JSON.parse(paramsEl.dataset.params) : {};
     setRunId(id => id + 1);
     
     // Add valid tickers to the request
     const validTickers = tickers.filter(t => t.status === 'valid').map(t => t.ticker);
+    const effectiveRfPct = rfOverride ?? rfData?.rate_pct ?? 10.50;
     
     optimize({
       tickers: validTickers,
-      ...params
+      rf_rate: effectiveRfPct / 100,
+      period,
+      max_weight: maxWeight,
+      estimator,
+      n_simulations: nSims
     });
   };
 
@@ -53,7 +64,16 @@ export default function App() {
             rfData={rfData}
             logs={logs}
             status={status}
-            onParamsChange={() => {}}
+            rfOverride={rfOverride}
+            setRfOverride={setRfOverride}
+            period={period}
+            setPeriod={setPeriod}
+            maxWeight={maxWeight}
+            setMaxWeight={setMaxWeight}
+            estimator={estimator}
+            setEstimator={setEstimator}
+            nSims={nSims}
+            setNSims={setNSims}
           />
 
           <AnimatePresence>

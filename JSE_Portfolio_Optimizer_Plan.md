@@ -1,3 +1,4 @@
+okay
 # JSE Portfolio Optimizer — Claude Code Implementation Plan
 
 ## Project Overview

@@ -1,17 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StageShell } from './StageShell';
-import { DEFAULT_MAX_WEIGHT, DEFAULT_PERIOD, DEFAULT_ESTIMATOR, DEFAULT_N_SIMS } from '../lib/constants';
 
-export function StageCompute({ rfData, logs, status, onParamsChange }) {
-  const [rfOverride, setRfOverride] = useState(null);
-  const [period, setPeriod] = useState(DEFAULT_PERIOD);
-  const [maxWeight, setMaxWeight] = useState(DEFAULT_MAX_WEIGHT);
-  const [estimator, setEstimator] = useState(DEFAULT_ESTIMATOR);
-  const [nSims, setNSims] = useState(DEFAULT_N_SIMS);
+export function StageCompute({
+  rfData,
+  logs,
+  status,
+  rfOverride,
+  setRfOverride,
+  period,
+  setPeriod,
+  maxWeight,
+  setMaxWeight,
+  estimator,
+  setEstimator,
+  nSims,
+  setNSims
+}) {
+  const [rfInput, setRfInput] = useState('');
 
-  const effectiveRfPct = rfOverride ?? rfData.rate_pct;
-  const params = { rf_rate: effectiveRfPct / 100, period, max_weight: maxWeight, estimator, n_simulations: nSims };
+  const effectiveRfPct = rfOverride ?? rfData?.rate_pct ?? 10.50;
+
+  useEffect(() => {
+    if (rfOverride === null) {
+      setRfInput((rfData?.rate_pct ?? 10.50).toFixed(2));
+    }
+  }, [rfOverride, rfData?.rate_pct]);
+
+  const handleRfChange = (e) => {
+    const val = e.target.value;
+    setRfInput(val);
+    if (val === '') {
+      setRfOverride(0);
+      return;
+    }
+    const parsed = parseFloat(val);
+    if (!isNaN(parsed)) {
+      setRfOverride(parsed);
+    }
+  };
 
   return (
     <StageShell number="02" label="PARAMETERS">
@@ -26,16 +53,16 @@ export function StageCompute({ rfData, logs, status, onParamsChange }) {
               min="0"
               max="30"
               step="0.01"
-              value={effectiveRfPct.toFixed(2)}
-              onChange={e => setRfOverride(parseFloat(e.target.value))}
+              value={rfInput}
+              onChange={handleRfChange}
               className="w-16 bg-transparent text-right font-mono text-sm text-nb-text
                          border border-nb-border focus:border-nb-cyan outline-none px-1"
             />
             <span className="font-mono text-xs text-nb-muted">%</span>
-            {rfData.source === 'FRED' && rfOverride === null && (
+            {rfData?.source === 'FRED' && rfOverride === null && (
               <span className="font-mono text-[8px] text-nb-cyan border border-nb-cyan px-1 py-px">FRED LIVE</span>
             )}
-            {rfData.source === 'fallback' && (
+            {rfData?.source === 'fallback' && (
               <span className="font-mono text-[8px] text-amber-500 border border-amber-500 px-1 py-px">FALLBACK</span>
             )}
             {rfOverride !== null && (
@@ -47,7 +74,7 @@ export function StageCompute({ rfData, logs, status, onParamsChange }) {
             )}
           </div>
         </div>
-        {rfData.source === 'FRED' && rfData.date && rfData.date !== 'fallback' && (
+        {rfData?.source === 'FRED' && rfData?.date && rfData?.date !== 'fallback' && (
           <p className="font-mono text-[8px] text-nb-dim text-right">
             IRLTLT01ZAM156N · as of {rfData.date}
           </p>
@@ -136,9 +163,6 @@ export function StageCompute({ rfData, logs, status, onParamsChange }) {
           </div>
         )}
       </div>
-
-      {/* App.jsx reads params from this hidden input at optimize-click time */}
-      <input type="hidden" data-params={JSON.stringify(params)} id="compute-params" />
     </StageShell>
   );
 }

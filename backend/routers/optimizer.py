@@ -27,14 +27,34 @@ async def optimize_stream(request: OptimizeRequest):
                 yield sse("fetch", {"ticker": f"{ticker}.JO", "status": "error", "msg": str(e)})
 
         import pandas as pd
-        valid_tickers = list(prices_per_ticker.keys())
-        if len(valid_tickers) < 3:
-            yield sse("error", {"msg": f"Only {len(valid_tickers)} tickers fetched successfully. Need at least 3."})
+        
+        # Build initial df and clean it using ffill, bfill, dropna
+        prices_df = pd.DataFrame(prices_per_ticker).ffill().bfill().dropna()
+        active_tickers = list(prices_df.columns)
+        tickers_dropped = [t for t in request.tickers if t not in active_tickers]
+
+        n_active = len(active_tickers)
+        if n_active < 3:
+            yield sse("error", {
+                "msg": f"Only {n_active} asset(s) have sufficient data (Need at least 3). "
+                       f"Dropped: {tickers_dropped}"
+            })
             return
 
-        prices_df = pd.DataFrame(prices_per_ticker)
-        prices_df.dropna(inplace=True)
-        tickers_dropped = [t for t in request.tickers if t not in valid_tickers]
+        if len(prices_df) < 50:
+            yield sse("error", {
+                "msg": f"Insufficient overlapping historical data (only {len(prices_df)} rows). "
+                       f"Need at least 50 trading days."
+            })
+            return
+
+        if request.max_weight < 1.0 / n_active:
+            yield sse("error", {
+                "msg": f"With {n_active} active assets, the maximum weight must be at least {100/n_active:.1f}% "
+                       f"(currently set to {request.max_weight*100:.1f}%). "
+                       f"Please increase Max Weight or add more valid assets."
+            })
+            return
 
         yield sse("log", {"msg": "Building covariance matrix...", "status": "ok"})
 
@@ -68,10 +88,27 @@ async def optimize_stream(request: OptimizeRequest):
 @router.post("/optimize")
 async def optimize_json(request: OptimizeRequest):
     """Non-streaming endpoint — use for debugging before the SSE stream is wired up."""
-    import pandas as pd
+    from fastapi import HTTPException
     rf = await rf_service.get_rf_rate()
-    prices, dropped = await data_service.fetch_prices(request.tickers, request.period)
-    result = optimizer_service.run_optimization(prices, request, rf["rate"])
+    try:
+        prices, dropped = await data_service.fetch_prices(request.tickers, request.period)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    n_active = len(prices.columns)
+    if request.max_weight < 1.0 / n_active:
+        raise HTTPException(
+            status_code=400,
+            detail=f"With {n_active} active assets, the maximum weight must be at least {100/n_active:.1f}% "
+                   f"(currently set to {request.max_weight*100:.1f}%). "
+                   f"Please increase Max Weight or add more valid assets."
+        )
+
+    try:
+        result = optimizer_service.run_optimization(prices, request, rf["rate"])
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     sector_exposure = sector_service.compute_sector_exposure(
         {w["ticker"]: w["weight"] for w in result["weights"]}
     )
@@ -88,8 +125,12 @@ async def optimize_json(request: OptimizeRequest):
 @router.post("/backtest")
 async def backtest(request: OptimizeRequest):
     from services.backtest_service import compute_equity_curve
-    prices, _ = await data_service.fetch_prices(request.tickers, request.period)
-    rf = await rf_service.get_rf_rate()
-    result = optimizer_service.run_optimization(prices, request, rf["rate"])
-    weights = {w["ticker"]: w["weight"] for w in result["weights"]}
-    return await compute_equity_curve(prices, weights, request.period)
+    from fastapi import HTTPException
+    try:
+        prices, _ = await data_service.fetch_prices(request.tickers, request.period)
+        rf = await rf_service.get_rf_rate()
+        result = optimizer_service.run_optimization(prices, request, rf["rate"])
+        weights = {w["ticker"]: w["weight"] for w in result["weights"]}
+        return await compute_equity_curve(prices, weights, request.period)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

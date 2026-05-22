@@ -71,7 +71,12 @@ async def fetch_prices(tickers: list[str], period: str = "3y") -> tuple[pd.DataF
             f"Need at least 3. Dropped: {dropped}"
         )
 
-    clean = pd.DataFrame(prices_dict).dropna()
+    clean = pd.DataFrame(prices_dict).ffill().bfill().dropna()
+    if len(clean) < 50:
+        raise ValueError(
+            f"Insufficient overlapping historical data for the selected tickers. "
+            f"Only {len(clean)} overlapping trading days found."
+        )
     return clean, dropped
 
 
@@ -82,12 +87,51 @@ async def fetch_single(ticker: str, period: str = "3y") -> pd.Series:
     )
 
 
+JSE_TICKERS = {
+    "NPN": "Naspers Limited",
+    "PRX": "Prosus NV",
+    "BHP": "BHP Group Limited",
+    "AGL": "Anglo American PLC",
+    "SOL": "Sasol Limited",
+    "SBK": "Standard Bank Group",
+    "FSR": "Firstrand Limited",
+    "NED": "Nedbank Group",
+    "ABG": "Absa Group Limited",
+    "DSY": "Discovery Limited",
+    "SLM": "Sanlam Limited",
+    "SHP": "Shoprite Holdings",
+    "PIK": "Pick n Pay Stores",
+    "WHL": "Woolworths Holdings",
+    "MRP": "Mr Price Group",
+    "TFG": "The Foschini Group",
+    "TRU": "Truworths International",
+    "MTN": "MTN Group Limited",
+    "VOD": "Vodacom Group Limited",
+    "GFI": "Gold Fields Limited",
+    "HAR": "Harmony Gold Mining",
+    "AMS": "Anglo American Platinum",
+    "IMP": "Impala Platinum Holdings",
+    "SSW": "Sibanye Stillwater",
+    "SAP": "Sappi Limited",
+    "APN": "Aspen Pharmacare",
+    "BTI": "British American Tobacco",
+    "CPI": "Capitec Bank Holdings",
+    "REM": "Remgro Limited",
+    "OML": "Old Mutual Limited",
+    "OMU": "Old Mutual Limited"
+}
+
+
 async def validate_ticker(ticker: str) -> dict:
-    formatted = f"{ticker}.JO"
+    ticker_clean = ticker.upper().strip().replace(".JO", "")
+    if ticker_clean in JSE_TICKERS:
+        return {"valid": True, "ticker": ticker_clean, "name": JSE_TICKERS[ticker_clean]}
+
+    formatted = f"{ticker_clean}.JO"
     loop = asyncio.get_running_loop()
     try:
         info = await loop.run_in_executor(None, lambda: yf.Ticker(formatted).fast_info)
-        return {"valid": True, "ticker": ticker,
-                "name": getattr(info, "company_name", ticker)}
+        return {"valid": True, "ticker": ticker_clean,
+                "name": getattr(info, "company_name", ticker_clean)}
     except Exception:
-        return {"valid": False, "ticker": ticker}
+        return {"valid": False, "ticker": ticker_clean}

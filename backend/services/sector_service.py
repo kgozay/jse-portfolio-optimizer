@@ -1,13 +1,15 @@
 SECTOR_MAP = {
     # Consumer Discretionary
     "MRP": "Consumer Discretionary", "TFG": "Consumer Discretionary",
-    "CPI": "Consumer Discretionary", "TRU": "Consumer Discretionary",
+    "TRU": "Consumer Discretionary",
     # Consumer Staples
     "SHP": "Consumer Staples", "PIK": "Consumer Staples",
     "WHL": "Consumer Staples", "DCP": "Consumer Staples",
     # Financials
     "SBK": "Financials", "FSR": "Financials", "NED": "Financials",
     "ABG": "Financials", "DSY": "Financials", "SLM": "Financials",
+    "CPI": "Financials", "REM": "Financials", "OML": "Financials",
+    "OMU": "Financials",
     # Resources
     "AGL": "Resources", "BHP": "Resources", "SOL": "Resources",
     "SAP": "Resources", "SSW": "Resources", "IMP": "Resources",

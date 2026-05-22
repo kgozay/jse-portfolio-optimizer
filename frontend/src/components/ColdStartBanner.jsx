@@ -7,11 +7,38 @@ export function ColdStartBanner() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShow(true), 4000);
-    axios.get(`${API_URL}/health`, { timeout: 4000 })
-      .then(() => { clearTimeout(timer); setShow(false); })
-      .catch(() => {});
-    return () => clearTimeout(timer);
+    let isMounted = true;
+    let intervalId = null;
+
+    // Show the banner if backend is not ready after 4 seconds
+    const showTimer = setTimeout(() => {
+      if (isMounted) setShow(true);
+    }, 4000);
+
+    const checkHealth = async () => {
+      try {
+        await axios.get(`${API_URL}/health`, { timeout: 3000 });
+        if (isMounted) {
+          setShow(false);
+          clearTimeout(showTimer);
+          if (intervalId) clearInterval(intervalId);
+        }
+      } catch {
+        // Backend is still cold, continue polling
+      }
+    };
+
+    // Run immediate check
+    checkHealth();
+
+    // Setup polling every 3 seconds
+    intervalId = setInterval(checkHealth, 3000);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(showTimer);
+      if (intervalId) clearInterval(intervalId);
+    };
   }, []);
 
   return (

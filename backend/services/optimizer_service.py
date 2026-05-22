@@ -15,7 +15,17 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
     ef = EfficientFrontier(mu, S)
     ef.add_constraint(lambda w: w <= request.max_weight)
     ef.add_constraint(lambda w: w >= 0.0)
-    ef.max_sharpe(risk_free_rate=rf_rate)
+    
+    try:
+        ef.max_sharpe(risk_free_rate=rf_rate)
+    except ValueError as e:
+        if "risk-free" in str(e).lower() or "risk_free" in str(e).lower() or all(mu < rf_rate):
+            raise ValueError(
+                f"The risk-free rate ({rf_rate*100:.2f}%) is higher than the expected returns of all selected assets. "
+                "Optimization is mathematically impossible. Please lower the risk-free rate or choose different assets."
+            )
+        raise ValueError(f"Optimization solver error: {str(e)}")
+        
     weights = ef.clean_weights()
     perf = ef.portfolio_performance(risk_free_rate=rf_rate, verbose=False)
 
@@ -38,7 +48,7 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
     ]
 
     mc = _monte_carlo_vectorised(mu, S_arr, rf_rate, request.n_simulations)
-    frontier = _frontier_line(mu, S, rf_rate)
+    frontier = _frontier_line(mu, S, rf_rate, request.max_weight)
 
     return {
         "weights": weight_list,
@@ -66,17 +76,18 @@ def _monte_carlo_vectorised(mu, S_arr, rf: float, n: int) -> list[dict]:
         {"vol": round(float(vols[i]), 5),
          "ret": round(float(rets[i]), 5),
          "sharpe": round(float(sharpes[i]), 4)}
-        for i in idx
+         for i in idx
     ]
 
 
-def _frontier_line(mu, S, rf: float, n_points: int = 40) -> list[dict]:
+def _frontier_line(mu, S, rf: float, max_weight: float, n_points: int = 40) -> list[dict]:
     mu_min, mu_max = float(mu.min()), float(mu.max())
     points = []
     for target in np.linspace(mu_min, mu_max, n_points):
         try:
             ef = EfficientFrontier(mu, S)
             ef.add_constraint(lambda w: w >= 0)
+            ef.add_constraint(lambda w: w <= max_weight)
             ef.efficient_return(target)
             perf = ef.portfolio_performance(risk_free_rate=rf, verbose=False)
             points.append({"vol": round(perf[1], 5), "ret": round(perf[0], 5)})
