@@ -8,3 +8,64 @@
 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 .cursor { animation: blink 800ms step-end infinite; }
+
+/* Radar scanner sweep line */
+@keyframes scan-sweep {
+  0% { top: -5%; opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { top: 105%; opacity: 0; }
+}
+.scan-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #00D4FF, transparent);
+  box-shadow: 0 0 8px #00D4FF;
+  pointer-events: none;
+  animation: scan-sweep 2.5s infinite linear;
+}
+
+/* Breathing glow active stage outline */
+@keyframes border-glow {
+  0%, 100% { 
+    border-color: #2C2C2E; 
+    box-shadow: 0 0 0px rgba(0, 212, 255, 0); 
+  }
+  50% { 
+    border-color: #00D4FF; 
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.12); 
+  }
+}
+.active-glow {
+  animation: border-glow 2.5s infinite ease-in-out;
+  border-top-color: #00D4FF !important;
+}
+
+/* Neo-brutalist tactile hover translation pop offsets */
+.nb-pop-btn {
+  transition: transform 0.1s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.1s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.15s ease;
+}
+.nb-pop-btn:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0px 0px #00D4FF;
+}
+.nb-pop-btn:active:not(:disabled) {
+  transform: translate(0px, 0px);
+  box-shadow: 0px 0px 0px 0px #00D4FF;
+}
+
+.nb-pop-card {
+  transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.15s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.15s ease;
+}
+.nb-pop-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 4px 4px 0px 0px #2C2C2E;
+  border-color: #3A3A3C;
+}
+.nb-pop-card:active {
+  transform: translate(0px, 0px);
+  box-shadow: 0px 0px 0px 0px #2C2C2E;
+}
+

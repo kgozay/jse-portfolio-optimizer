@@ -50,6 +50,16 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
     mc = _monte_carlo_vectorised(mu, S_arr, rf_rate, request.n_simulations)
     frontier = _frontier_line(mu, S, rf_rate, request.max_weight)
 
+    # Clean tickers for asset returns and covariance
+    asset_returns = {t.replace(".JO", ""): float(v) for t, v in mu.items()}
+    covariance = {}
+    for t1 in S.columns:
+        t1_clean = t1.replace(".JO", "")
+        covariance[t1_clean] = {}
+        for t2 in S.columns:
+            t2_clean = t2.replace(".JO", "")
+            covariance[t1_clean][t2_clean] = float(S.loc[t1, t2])
+
     return {
         "weights": weight_list,
         "expected_return": round(perf[0], 6),
@@ -60,6 +70,8 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
         "optimal_point": {"vol": round(perf[1], 6), "ret": round(perf[0], 6)},
         "duration_ms": round((time.time() - start) * 1000),
         "weights_sum_check": round(sum(weights.values()), 6),
+        "asset_returns": asset_returns,
+        "covariance": covariance,
     }
 
 

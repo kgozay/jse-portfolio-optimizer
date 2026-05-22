@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import { StageInput } from './components/StageInput';
 import { StageCompute } from './components/StageCompute';
 import { StageOutput } from './components/StageOutput';
 import { ColdStartBanner } from './components/ColdStartBanner';
 import { useOptimizer } from './hooks/useOptimizer';
 import { useRfRate } from './hooks/useRfRate';
-import { DEFAULT_MAX_WEIGHT, DEFAULT_PERIOD, DEFAULT_ESTIMATOR, DEFAULT_N_SIMS } from './lib/constants';
+import { API_URL, DEFAULT_MAX_WEIGHT, DEFAULT_PERIOD, DEFAULT_ESTIMATOR, DEFAULT_N_SIMS } from './lib/constants';
 
 export default function App() {
   const [tickers, setTickers] = useState([]);
@@ -20,6 +21,10 @@ export default function App() {
   const [maxWeight, setMaxWeight] = useState(DEFAULT_MAX_WEIGHT);
   const [estimator, setEstimator] = useState(DEFAULT_ESTIMATOR);
   const [nSims, setNSims] = useState(DEFAULT_N_SIMS);
+
+  // Backtest state
+  const [backtestResult, setBacktestResult] = useState(null);
+  const [backtestStatus, setBacktestStatus] = useState('idle'); // idle | loading | done | error
 
   const handleOptimize = async () => {
     setRunId(id => id + 1);
@@ -38,7 +43,45 @@ export default function App() {
     });
   };
 
+  useEffect(() => {
+    if (status === 'done' && result) {
+      const fetchBacktest = async () => {
+        setBacktestStatus('loading');
+        setBacktestResult(null);
+        try {
+          const validTickers = tickers.filter(t => t.status === 'valid').map(t => t.ticker);
+          const effectiveRfPct = rfOverride ?? rfData?.rate_pct ?? 10.50;
+          
+          const payload = {
+            tickers: validTickers,
+            rf_rate: effectiveRfPct / 100,
+            period,
+            max_weight: maxWeight,
+            estimator,
+            n_simulations: nSims
+          };
+          
+          const res = await axios.post(`${API_URL}/backtest`, payload);
+          setBacktestResult(res.data);
+          setBacktestStatus('done');
+        } catch (err) {
+          console.error("Backtest fetch failed:", err);
+          setBacktestStatus('error');
+        }
+      };
+      fetchBacktest();
+    } else if (status === 'running') {
+      setBacktestResult(null);
+      setBacktestStatus('idle');
+    }
+  }, [status, result]);
+
   const optimizeDisabled = tickers.filter(t => t.status === 'valid').length < 3 || status === 'running';
+
+  // Determine active stages for cyber-border glow
+  const stage1Active = status !== 'running' && status !== 'done' && tickers.filter(t => t.status === 'valid').length < 3;
+  const stage2Active = status === 'running' || (status === 'idle' && tickers.filter(t => t.status === 'valid').length >= 3);
+  const stage3Active = status === 'done';
 
   return (
     <div className="min-h-screen bg-nb-bg text-nb-text p-4 md:p-8 flex justify-center pb-24">
@@ -58,6 +101,7 @@ export default function App() {
             setTickers={setTickers} 
             onOptimize={handleOptimize}
             optimizeDisabled={optimizeDisabled} 
+            isActive={stage1Active}
           />
           
           <StageCompute 
@@ -74,11 +118,18 @@ export default function App() {
             setEstimator={setEstimator}
             nSims={nSims}
             setNSims={setNSims}
+            isActive={stage2Active}
           />
 
           <AnimatePresence>
             {result && status === 'done' && (
-              <StageOutput result={result} runId={runId} />
+              <StageOutput 
+                result={result} 
+                runId={runId} 
+                backtestResult={backtestResult} 
+                backtestStatus={backtestStatus}
+                isActive={stage3Active}
+              />
             )}
           </AnimatePresence>
         </div>

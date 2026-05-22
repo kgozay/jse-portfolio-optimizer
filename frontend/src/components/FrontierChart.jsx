@@ -26,7 +26,7 @@ function PortfolioTooltip({ active, payload, rfRate }) {
   );
 }
 
-export function FrontierChart({ result }) {
+export function FrontierChart({ result, customPoint }) {
   const [visibleMcPoints, setVisibleMcPoints] = useState([]);
 
   useEffect(() => {
@@ -57,6 +57,22 @@ export function FrontierChart({ result }) {
         <Scatter data={visibleMcPoints} fill="rgba(0,190,220,0.22)" />
         <Scatter data={result.frontier} line={{ stroke: '#00D4FF', strokeWidth: 1.5 }} fill="none" />
         <Scatter data={[result.optimal_point]} fill="#00C853" />
+        {customPoint && (
+          <Scatter 
+            data={[customPoint]} 
+            fill="#FFB340"
+            shape={(props) => {
+              const { cx, cy } = props;
+              if (cx === undefined || cy === undefined) return null;
+              return (
+                <g key="custom-sight">
+                  <circle cx={cx} cy={cy} r={6} fill="#FFB340" stroke="#0C0C0D" strokeWidth={1.5} />
+                  <circle cx={cx} cy={cy} r={1.5} fill="#0C0C0D" />
+                </g>
+              );
+            }}
+          />
+        )}
       </ScatterChart>
     </ResponsiveContainer>
   );

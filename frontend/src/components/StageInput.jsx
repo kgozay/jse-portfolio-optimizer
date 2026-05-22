@@ -6,7 +6,7 @@ import { TickerAutocomplete } from './TickerAutocomplete';
 import { useTickerValidation } from '../hooks/useTickerValidation';
 import { MIN_TICKERS, MAX_TICKERS } from '../lib/constants';
 
-export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled }) {
+export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled, isActive }) {
   const [input, setInput] = useState('');
 
   const handleValidationResult = useCallback((ticker, status, name) => {
@@ -29,7 +29,7 @@ export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled }
   const removeTicker = (ticker) => setTickers(prev => prev.filter(t => t.ticker !== ticker));
 
   return (
-    <StageShell number="01" label="INPUT">
+    <StageShell number="01" label="INPUT" isActive={isActive}>
       <div className="flex gap-2 mb-4">
         <TickerAutocomplete
           value={input}
@@ -42,7 +42,7 @@ export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled }
           disabled={tickers.length === 0}
           className="border border-nb-border font-mono text-[9px] tracking-widest px-3
                      text-nb-dim hover:border-nb-border-bright hover:text-nb-muted
-                     disabled:opacity-30 disabled:cursor-not-allowed"
+                     disabled:opacity-30 disabled:cursor-not-allowed nb-pop-btn"
         >
           CLEAR ALL
         </button>
@@ -83,8 +83,8 @@ export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled }
         onClick={onOptimize}
         disabled={optimizeDisabled}
         className="mt-4 w-full border-2 border-nb-cyan font-mono text-[10px] tracking-widest
-                   py-3 text-nb-cyan hover:bg-nb-cyan hover:text-nb-bg transition-colors
-                   disabled:border-nb-border disabled:text-nb-dim disabled:cursor-not-allowed"
+                   py-3 text-nb-cyan hover:bg-nb-cyan hover:text-nb-bg transition-all
+                   disabled:border-nb-border disabled:text-nb-dim disabled:cursor-not-allowed nb-pop-btn"
         whileTap={!optimizeDisabled ? { scale: 0.98 } : {}}
       >
         OPTIMIZE PORTFOLIO
