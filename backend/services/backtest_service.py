@@ -64,13 +64,13 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str)
         # Align benchmark to portfolio index
         benchmark_aligned = benchmark_curve.reindex(portfolio_curve.index, method="ffill").fillna(100)
 
+    port_ret = (portfolio_curve.iloc[-1] / 100 - 1) * 100
+    bench_ret = (benchmark_aligned.iloc[-1] / 100 - 1) * 100
     return {
         "dates": portfolio_curve.index.strftime("%Y-%m-%d").tolist(),
         "portfolio": portfolio_curve.round(2).tolist(),
         "benchmark": benchmark_aligned.round(2).tolist(),
-        "total_return_pct": round((portfolio_curve.iloc[-1] / 100 - 1) * 100, 2),
-        "benchmark_return_pct": round((benchmark_aligned.iloc[-1] / 100 - 1) * 100, 2),
-        "alpha_pct": round(
-            (portfolio_curve.iloc[-1] - benchmark_aligned.iloc[-1]) / benchmark_aligned.iloc[-1] * 100, 2
-        ),
+        "total_return_pct": round(port_ret, 2),
+        "benchmark_return_pct": round(bench_ret, 2),
+        "alpha_pct": round(port_ret - bench_ret, 2),
     }

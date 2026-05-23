@@ -12,9 +12,7 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
          if request.estimator == "ledoit_wolf"
          else risk_models.sample_cov(prices))
 
-    ef = EfficientFrontier(mu, S)
-    ef.add_constraint(lambda w: w <= request.max_weight)
-    ef.add_constraint(lambda w: w >= 0.0)
+    ef = EfficientFrontier(mu, S, weight_bounds=(0.0, request.max_weight))
     
     try:
         ef.max_sharpe(risk_free_rate=rf_rate)
@@ -97,9 +95,7 @@ def _frontier_line(mu, S, rf: float, max_weight: float, n_points: int = 40) -> l
     points = []
     for target in np.linspace(mu_min, mu_max, n_points):
         try:
-            ef = EfficientFrontier(mu, S)
-            ef.add_constraint(lambda w: w >= 0)
-            ef.add_constraint(lambda w: w <= max_weight)
+            ef = EfficientFrontier(mu, S, weight_bounds=(0.0, max_weight))
             ef.efficient_return(target)
             perf = ef.portfolio_performance(risk_free_rate=rf, verbose=False)
             points.append({"vol": round(perf[1], 5), "ret": round(perf[0], 5)})

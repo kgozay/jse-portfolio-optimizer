@@ -13,8 +13,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="JSE Portfolio Optimizer API", version="1.0.0", lifespan=lifespan)
 
-# Filter None in case CORS_ORIGIN env var is not set
-origins = list(filter(None, [os.getenv("CORS_ORIGIN"), "http://localhost:5173"]))
+# Filter None and support comma-separated CORS origins
+cors_env = os.getenv("CORS_ORIGIN")
+env_origins = [o.strip() for o in cors_env.split(",")] if cors_env else []
+origins = list(filter(None, env_origins + ["http://localhost:5173"]))
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

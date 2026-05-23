@@ -1,7 +1,7 @@
 import httpx
 import os
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ _cache: dict = {"data": None, "fetched_at": None}
 
 async def get_rf_rate() -> dict:
     if _cache["data"] is not None:
-        age = datetime.utcnow() - _cache["fetched_at"]
+        age = datetime.now(timezone.utc) - _cache["fetched_at"]
         if age < timedelta(hours=CACHE_TTL_HOURS):
             return _cache["data"]
 
@@ -59,7 +59,7 @@ async def get_rf_rate() -> dict:
             "series_id": FRED_SERIES_ID,
         }
         _cache["data"] = result
-        _cache["fetched_at"] = datetime.utcnow()
+        _cache["fetched_at"] = datetime.now(timezone.utc)
         logger.info(f"FRED Rf rate: {result['rate_pct']}% (as of {rate_date})")
         return result
 
