@@ -30,7 +30,7 @@ export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled, 
 
   return (
     <StageShell number="01" label="INPUT" isActive={isActive}>
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-3">
         <TickerAutocomplete
           value={input}
           onChange={setInput}
@@ -46,6 +46,33 @@ export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled, 
         >
           CLEAR ALL
         </button>
+      </div>
+
+      {/* Preset Quick-Load Templates */}
+      <div className="flex flex-wrap items-center gap-1.5 mb-4 text-[9px] font-mono text-nb-muted">
+        <span className="text-[8px] tracking-widest text-nb-dim uppercase mr-1">PRESETS:</span>
+        {[
+          { label: 'BLUE CHIPS', tickers: ['NPN', 'SBK', 'SHP', 'MTN', 'BHP'] },
+          { label: 'RESOURCES', tickers: ['BHP', 'AGL', 'SOL', 'GFI', 'HAR'] },
+          { label: 'FINANCIALS', tickers: ['SBK', 'FSR', 'NED', 'ABG', 'CPI'] },
+          { label: 'CONSUMER', tickers: ['SHP', 'WHL', 'MRP', 'TFG', 'TRU'] },
+        ].map(p => (
+          <button
+            key={p.label}
+            onClick={() => {
+              const newTickers = p.tickers.map(tick => ({
+                ticker: tick,
+                name: null,
+                status: 'loading'
+              }));
+              setTickers(newTickers);
+              newTickers.forEach(t => validate(t.ticker));
+            }}
+            className="border border-nb-border px-2 py-0.5 hover:border-nb-cyan hover:text-nb-cyan transition-all text-nb-dim bg-nb-surface/40 hover:bg-nb-cyan/5 nb-pop-btn"
+          >
+            {p.label}
+          </button>
+        ))}
       </div>
 
       <AnimatePresence mode="popLayout">

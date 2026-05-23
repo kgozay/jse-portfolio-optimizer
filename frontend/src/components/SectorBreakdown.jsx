@@ -8,6 +8,7 @@ const SECTOR_COLORS = {
   'Consumer Staples':        '#30D158',
   'Technology':              '#0A84FF',
   'Telecommunications':      '#FF9F0A',
+  'Real Estate':             '#5E5CE6',
   'Other':                   '#646464',
 };
 

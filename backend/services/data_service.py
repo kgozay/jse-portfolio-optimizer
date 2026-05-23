@@ -118,7 +118,15 @@ JSE_TICKERS = {
     "CPI": "Capitec Bank Holdings",
     "REM": "Remgro Limited",
     "OML": "Old Mutual Limited",
-    "OMU": "Old Mutual Limited"
+    "OMU": "Old Mutual Limited",
+    "BID": "Bid Corporation",
+    "BVT": "Bidvest Group",
+    "CLS": "Clicks Group",
+    "EXX": "Exxaro Resources",
+    "KIO": "Kumba Iron Ore",
+    "GRT": "Growthpoint Properties",
+    "OUT": "OUTsurance Group",
+    "PPH": "Pepkor Holdings"
 }
 
 

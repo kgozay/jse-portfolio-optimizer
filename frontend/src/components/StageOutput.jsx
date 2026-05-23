@@ -7,6 +7,7 @@ import { MetricCard } from './MetricCard';
 import { SectorBreakdown } from './SectorBreakdown';
 import { ExportButton } from './ExportButton';
 import { BacktestChart } from './BacktestChart';
+import { CorrelationMatrix } from './CorrelationMatrix';
 
 export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
   const [activeTab, setActiveTab] = useState('frontier'); // frontier | backtest
@@ -115,11 +116,19 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
             <div className="flex border border-nb-border mb-4 font-mono text-[9px] tracking-widest bg-nb-bg">
               <button 
                 onClick={() => setActiveTab('frontier')}
-                className={`flex-1 py-2 text-center transition-colors ${
-                  activeTab === 'frontier' ? 'bg-nb-surface text-nb-cyan font-bold border-r border-nb-border' : 'text-nb-muted hover:text-nb-text border-r border-nb-border'
+                className={`flex-1 py-2 text-center transition-colors border-r border-nb-border ${
+                  activeTab === 'frontier' ? 'bg-nb-surface text-nb-cyan font-bold' : 'text-nb-muted hover:text-nb-text'
                 }`}
               >
-                EFFICIENT FRONTIER
+                FRONTIER
+              </button>
+              <button 
+                onClick={() => setActiveTab('correlation')}
+                className={`flex-1 py-2 text-center transition-colors border-r border-nb-border ${
+                  activeTab === 'correlation' ? 'bg-nb-surface text-nb-cyan font-bold' : 'text-nb-muted hover:text-nb-text'
+                }`}
+              >
+                CORRELATION
               </button>
               <button 
                 onClick={() => setActiveTab('backtest')}
@@ -127,16 +136,20 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
                   activeTab === 'backtest' ? 'bg-nb-surface text-nb-cyan font-bold' : 'text-nb-muted hover:text-nb-text'
                 }`}
               >
-                HISTORICAL PERFORMANCE
+                BACKTEST
               </button>
             </div>
 
-            {activeTab === 'frontier' ? (
+            {activeTab === 'frontier' && (
               <FrontierChart 
                 result={result} 
                 customPoint={isAdjusting && customMetrics ? { vol: displayVolatility, ret: displayReturn } : null}
               />
-            ) : (
+            )}
+            {activeTab === 'correlation' && (
+              <CorrelationMatrix result={result} />
+            )}
+            {activeTab === 'backtest' && (
               <div className="min-h-[260px]">
                 {backtestStatus === 'loading' && (
                   <div className="h-[210px] flex flex-col items-center justify-center font-mono text-[10px] text-nb-muted gap-2">

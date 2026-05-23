@@ -37,11 +37,11 @@ export function BacktestChart({ backtestResult }) {
 
   if (!backtestResult) return null;
 
-  const { total_return_pct, benchmark_return_pct, alpha_pct } = backtestResult;
+  const { total_return_pct, benchmark_return_pct, alpha_pct, max_drawdown_pct, beta, sortino_ratio } = backtestResult;
   const isAlphaPositive = alpha_pct >= 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Backtest mini dashboard */}
       <div className="grid grid-cols-3 gap-2">
         <div className="border border-nb-border p-2">
@@ -60,6 +60,28 @@ export function BacktestChart({ backtestResult }) {
           <div className="font-mono text-[7px] tracking-widest text-nb-dim">ALPHA OUTPERF.</div>
           <div className={`font-mono text-xs mt-1 ${isAlphaPositive ? 'text-nb-cyan' : 'text-nb-red'}`}>
             {isAlphaPositive ? '+' : ''}{alpha_pct.toFixed(2)}%
+          </div>
+        </div>
+      </div>
+
+      {/* Advanced Risk Metrics Row */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="border border-nb-border p-2">
+          <div className="font-mono text-[7px] tracking-widest text-nb-dim">MAX DRAWDOWN</div>
+          <div className="font-mono text-xs mt-1 text-nb-red">
+            {max_drawdown_pct?.toFixed(2)}%
+          </div>
+        </div>
+        <div className="border border-nb-border p-2">
+          <div className="font-mono text-[7px] tracking-widest text-nb-dim">PORTFOLIO BETA</div>
+          <div className="font-mono text-xs mt-1 text-nb-cyan">
+            {beta?.toFixed(2)}
+          </div>
+        </div>
+        <div className="border border-nb-border p-2">
+          <div className="font-mono text-[7px] tracking-widest text-nb-dim">SORTINO RATIO</div>
+          <div className="font-mono text-xs mt-1 text-nb-emerald">
+            {sortino_ratio?.toFixed(2)}
           </div>
         </div>
       </div>

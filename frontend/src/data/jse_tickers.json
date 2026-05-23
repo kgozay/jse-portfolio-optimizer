@@ -28,5 +28,13 @@
   {"ticker":"BTI","name":"British American Tobacco","sector":"Industrials","cap_tier":"large"},
   {"ticker":"CPI","name":"Capitec Bank Holdings","sector":"Financials","cap_tier":"large"},
   {"ticker":"REM","name":"Remgro Limited","sector":"Financials","cap_tier":"large"},
-  {"ticker":"OML","name":"Old Mutual Limited","sector":"Financials","cap_tier":"large"}
+  {"ticker":"OML","name":"Old Mutual Limited","sector":"Financials","cap_tier":"large"},
+  {"ticker":"BID","name":"Bid Corporation","sector":"Consumer Discretionary","cap_tier":"large"},
+  {"ticker":"BVT","name":"Bidvest Group","sector":"Industrials","cap_tier":"large"},
+  {"ticker":"CLS","name":"Clicks Group","sector":"Consumer Staples","cap_tier":"large"},
+  {"ticker":"EXX","name":"Exxaro Resources","sector":"Resources","cap_tier":"mid"},
+  {"ticker":"KIO","name":"Kumba Iron Ore","sector":"Resources","cap_tier":"large"},
+  {"ticker":"GRT","name":"Growthpoint Properties","sector":"Real Estate","cap_tier":"large"},
+  {"ticker":"OUT","name":"OUTsurance Group","sector":"Financials","cap_tier":"large"},
+  {"ticker":"PPH","name":"Pepkor Holdings","sector":"Consumer Discretionary","cap_tier":"large"}
 ]

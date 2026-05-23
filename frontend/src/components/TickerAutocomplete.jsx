@@ -9,6 +9,7 @@ const SECTOR_SHORT = {
   'Consumer Staples':       'STAP',
   'Technology':             'TECH',
   'Telecommunications':     'TELCO',
+  'Real Estate':            'REIT',
 };
 
 export function TickerAutocomplete({ value, onChange, onSelect, disabled }) {

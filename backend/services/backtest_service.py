@@ -66,6 +66,30 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str)
 
     port_ret = (portfolio_curve.iloc[-1] / 100 - 1) * 100
     bench_ret = (benchmark_aligned.iloc[-1] / 100 - 1) * 100
+    
+    # Calculate Max Drawdown
+    cum_max = portfolio_curve.cummax()
+    drawdown = (portfolio_curve - cum_max) / cum_max
+    max_drawdown = float(drawdown.min() * 100)
+    
+    # Calculate Sortino Ratio (downside risk-adjusted return relative to 0.105 risk-free rate)
+    downside_returns = portfolio_returns[portfolio_returns < 0]
+    downside_deviation = float(np.sqrt((downside_returns ** 2).mean()) * np.sqrt(252)) if len(downside_returns) > 0 else 1e-8
+    avg_daily_return = portfolio_returns.mean()
+    ann_return = float((1 + avg_daily_return) ** 252 - 1)
+    sortino_ratio = (ann_return - 0.105) / downside_deviation if downside_deviation > 0 else 0.0
+    
+    # Calculate Portfolio Beta relative to the Benchmark
+    benchmark_returns = benchmark_aligned.pct_change().dropna()
+    aligned_df = pd.DataFrame({"port": portfolio_returns, "bench": benchmark_returns}).dropna()
+    if len(aligned_df) > 1:
+        cov_matrix = aligned_df.cov()
+        cov_pb = cov_matrix.loc["port", "bench"]
+        var_b = cov_matrix.loc["bench", "bench"]
+        beta = float(cov_pb / var_b) if var_b > 1e-8 else 1.0
+    else:
+        beta = 1.0
+        
     return {
         "dates": portfolio_curve.index.strftime("%Y-%m-%d").tolist(),
         "portfolio": portfolio_curve.round(2).tolist(),
@@ -73,4 +97,7 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str)
         "total_return_pct": round(port_ret, 2),
         "benchmark_return_pct": round(bench_ret, 2),
         "alpha_pct": round(port_ret - bench_ret, 2),
+        "max_drawdown_pct": round(max_drawdown, 2),
+        "sortino_ratio": round(sortino_ratio, 2),
+        "beta": round(beta, 2),
     }

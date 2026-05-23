@@ -21,6 +21,7 @@ export default function App() {
   const [maxWeight, setMaxWeight] = useState(DEFAULT_MAX_WEIGHT);
   const [estimator, setEstimator] = useState(DEFAULT_ESTIMATOR);
   const [nSims, setNSims] = useState(DEFAULT_N_SIMS);
+  const [objective, setObjective] = useState('max_sharpe');
 
   // Backtest state
   const [backtestResult, setBacktestResult] = useState(null);
@@ -39,7 +40,8 @@ export default function App() {
       period,
       max_weight: maxWeight,
       estimator,
-      n_simulations: nSims
+      n_simulations: nSims,
+      objective
     });
   };
 
@@ -58,7 +60,8 @@ export default function App() {
             period,
             max_weight: maxWeight,
             estimator,
-            n_simulations: nSims
+            n_simulations: nSims,
+            objective
           };
           
           const res = await axios.post(`${API_URL}/backtest`, payload);
@@ -118,6 +121,8 @@ export default function App() {
             setEstimator={setEstimator}
             nSims={nSims}
             setNSims={setNSims}
+            objective={objective}
+            setObjective={setObjective}
             isActive={stage2Active}
           />
 

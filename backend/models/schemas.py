@@ -8,6 +8,7 @@ class OptimizeRequest(BaseModel):
     max_weight: float = Field(0.40, ge=0.05, le=1.0)
     estimator: str = Field("ledoit_wolf", pattern="^(ledoit_wolf|sample)$")
     n_simulations: int = Field(5000, ge=1000, le=10000)
+    objective: str = Field("max_sharpe", pattern="^(max_sharpe|min_volatility)$")
 
     @field_validator("tickers")
     @classmethod

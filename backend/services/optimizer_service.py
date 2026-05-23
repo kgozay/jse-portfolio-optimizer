@@ -15,7 +15,10 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
     ef = EfficientFrontier(mu, S, weight_bounds=(0.0, request.max_weight))
     
     try:
-        ef.max_sharpe(risk_free_rate=rf_rate)
+        if request.objective == "min_volatility":
+            ef.min_volatility()
+        else:
+            ef.max_sharpe(risk_free_rate=rf_rate)
     except ValueError as e:
         if "risk-free" in str(e).lower() or "risk_free" in str(e).lower() or all(mu < rf_rate):
             raise ValueError(

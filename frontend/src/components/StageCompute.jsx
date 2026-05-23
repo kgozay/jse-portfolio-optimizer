@@ -16,6 +16,8 @@ export function StageCompute({
   setEstimator,
   nSims,
   setNSims,
+  objective,
+  setObjective,
   isActive
 }) {
   const [rfInput, setRfInput] = useState('');
@@ -80,6 +82,23 @@ export function StageCompute({
             IRLTLT01ZAM156N · as of {rfData.date}
           </p>
         )}
+
+        {/* Optimization Target Objective */}
+        <div className="flex justify-between items-center">
+          <span className="font-mono text-[9px] tracking-widest text-nb-muted">OPTIMIZATION TARGET</span>
+          <div className="flex gap-1.5">
+            {[['max_sharpe','MAX SHARPE'],['min_volatility','MIN VOLATILITY']].map(([val, label]) => (
+              <button key={val} onClick={() => setObjective(val)}
+                      className={`font-mono text-[9px] px-2 py-1 border transition-all nb-pop-btn ${
+                        objective === val 
+                          ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]' 
+                          : 'border-nb-border text-nb-dim hover:text-nb-text bg-nb-bg'
+                      }`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Lookback period */}
         <div className="flex justify-between items-center">
