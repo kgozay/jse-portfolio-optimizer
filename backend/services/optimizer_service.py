@@ -50,7 +50,7 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
     mc = _monte_carlo_vectorised(mu, S_arr, rf_rate, request.n_simulations)
     frontier = _frontier_line(mu, S, rf_rate, request.max_weight)
 
-    # Clean tickers for asset returns and covariance
+    # Clean tickers for asset returns, covariance and correlation
     asset_returns = {t.replace(".JO", ""): float(v) for t, v in mu.items()}
     covariance = {}
     for t1 in S.columns:
@@ -59,6 +59,22 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
         for t2 in S.columns:
             t2_clean = t2.replace(".JO", "")
             covariance[t1_clean][t2_clean] = float(S.loc[t1, t2])
+
+    # Correlation matrix derived from covariance
+    std_arr = np.sqrt(np.diag(S_arr))
+    corr_arr = np.where(
+        np.outer(std_arr, std_arr) > 0,
+        S_arr / np.outer(std_arr, std_arr),
+        0.0
+    )
+    corr_arr = np.clip(corr_arr, -1.0, 1.0)
+    correlation = {}
+    for i, t1 in enumerate(S.columns):
+        t1_clean = t1.replace(".JO", "")
+        correlation[t1_clean] = {}
+        for j, t2 in enumerate(S.columns):
+            t2_clean = t2.replace(".JO", "")
+            correlation[t1_clean][t2_clean] = round(float(corr_arr[i, j]), 4)
 
     return {
         "weights": weight_list,
@@ -72,27 +88,29 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
         "weights_sum_check": round(sum(weights.values()), 6),
         "asset_returns": asset_returns,
         "covariance": covariance,
+        "correlation": correlation,
     }
 
 
 def _monte_carlo_vectorised(mu, S_arr, rf: float, n: int) -> list[dict]:
     n_assets = len(mu)
     mu_arr = mu.values if hasattr(mu, "values") else np.array(mu)
-    W = np.random.dirichlet(np.ones(n_assets), size=n)
+    # BUG-3 fix: generate only the points we'll send to the frontend (max 1000)
+    n_sample = min(n, 1000)
+    W = np.random.dirichlet(np.ones(n_assets), size=n_sample)
     rets = W @ mu_arr
     vols = np.sqrt(np.einsum("ij,jk,ik->i", W, S_arr, W))
     sharpes = np.where(vols > 0, (rets - rf) / vols, 0.0)
 
-    idx = np.random.choice(n, size=min(1000, n), replace=False)
     return [
         {"vol": round(float(vols[i]), 5),
          "ret": round(float(rets[i]), 5),
          "sharpe": round(float(sharpes[i]), 4)}
-         for i in idx
+        for i in range(n_sample)
     ]
 
 
-def _frontier_line(mu, S, rf: float, max_weight: float, n_points: int = 40) -> list[dict]:
+def _frontier_line(mu, S, rf: float, max_weight: float, n_points: int = 25) -> list[dict]:
     mu_min, mu_max = float(mu.min()), float(mu.max())
     points = []
     for target in np.linspace(mu_min, mu_max, n_points):

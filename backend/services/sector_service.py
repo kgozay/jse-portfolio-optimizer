@@ -1,25 +1,33 @@
 SECTOR_MAP = {
     # Consumer Discretionary
     "MRP": "Consumer Discretionary", "TFG": "Consumer Discretionary",
-    "TRU": "Consumer Discretionary",
+    "TRU": "Consumer Discretionary", "PPH": "Consumer Discretionary",
+    "ITU": "Consumer Discretionary", "CFR": "Consumer Discretionary",
     # Consumer Staples
     "SHP": "Consumer Staples", "PIK": "Consumer Staples",
     "WHL": "Consumer Staples", "DCP": "Consumer Staples",
+    "CLS": "Consumer Staples", "AVI": "Consumer Staples",
+    "BID": "Consumer Staples", "SPP": "Consumer Staples",
     # Financials
     "SBK": "Financials", "FSR": "Financials", "NED": "Financials",
     "ABG": "Financials", "DSY": "Financials", "SLM": "Financials",
     "CPI": "Financials", "REM": "Financials", "OML": "Financials",
-    "OMU": "Financials",
+    "SNT": "Financials",
     # Resources
     "AGL": "Resources", "BHP": "Resources", "SOL": "Resources",
     "SAP": "Resources", "SSW": "Resources", "IMP": "Resources",
     "GFI": "Resources", "HAR": "Resources", "AMS": "Resources",
+    "EXX": "Resources", "KIO": "Resources", "MNP": "Resources",
     # Industrials
     "BTI": "Industrials", "APN": "Industrials", "JSE": "Industrials",
+    "WBO": "Industrials",
     # Technology
     "NPN": "Technology", "PRX": "Technology",
     # Telecommunications
     "MTN": "Telecommunications", "VOD": "Telecommunications",
+    "MCG": "Telecommunications", "TKG": "Telecommunications",
+    # Real Estate
+    "GRT": "Real Estate", "RDF": "Real Estate", "SRE": "Real Estate",
 }
 
 

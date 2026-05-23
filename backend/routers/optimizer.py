@@ -1,4 +1,5 @@
 import json
+import asyncio
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from models.schemas import OptimizeRequest
@@ -18,17 +19,31 @@ async def optimize_stream(request: OptimizeRequest):
         yield sse("log", {"msg": f"Rf: {rf['rate_pct']:.2f}% ({rf['source'].upper()})", "status": "ok"})
 
         prices_per_ticker: dict = {}
-        for ticker in request.tickers:
-            try:
-                series = await data_service.fetch_single(ticker, request.period)
-                prices_per_ticker[ticker] = series
-                yield sse("fetch", {"ticker": f"{ticker}.JO", "rows": len(series), "status": "ok"})
-            except Exception as e:
-                yield sse("fetch", {"ticker": f"{ticker}.JO", "status": "error", "msg": str(e)})
+        result_queue: asyncio.Queue = asyncio.Queue()
+        sem = asyncio.Semaphore(3)
+
+        async def fetch_one(ticker: str) -> None:
+            async with sem:
+                try:
+                    series = await data_service.fetch_single(ticker, request.period)
+                    await result_queue.put(("ok", ticker, series))
+                except Exception as e:
+                    await result_queue.put(("error", ticker, str(e)))
+
+        tasks = [asyncio.create_task(fetch_one(t)) for t in request.tickers]
+
+        for _ in range(len(request.tickers)):
+            kind, ticker, payload = await result_queue.get()
+            if kind == "ok":
+                prices_per_ticker[ticker] = payload
+                yield sse("fetch", {"ticker": f"{ticker}.JO", "rows": len(payload), "status": "ok"})
+            else:
+                yield sse("fetch", {"ticker": f"{ticker}.JO", "status": "error", "msg": payload})
+
+        await asyncio.gather(*tasks, return_exceptions=True)
 
         import pandas as pd
-        
-        # Build initial df and clean it using ffill, bfill, dropna
+
         prices_df = pd.DataFrame(prices_per_ticker).ffill().bfill().dropna()
         active_tickers = list(prices_df.columns)
         tickers_dropped = [t for t in request.tickers if t not in active_tickers]
@@ -131,6 +146,6 @@ async def backtest(request: OptimizeRequest):
         rf = await rf_service.get_rf_rate()
         result = optimizer_service.run_optimization(prices, request, rf["rate"])
         weights = {w["ticker"]: w["weight"] for w in result["weights"]}
-        return await compute_equity_curve(prices, weights, request.period)
+        return await compute_equity_curve(prices, weights, request.period, rf["rate"])
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

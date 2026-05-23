@@ -102,10 +102,21 @@ export function StageCompute({
         <div>
           <div className="flex justify-between items-center mb-1">
             <span className="font-mono text-[9px] tracking-widest text-nb-muted">MAX WEIGHT</span>
-            <motion.span className="font-mono text-sm text-nb-text"
-              animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 0.12 }} key={maxWeight}>
-              {(maxWeight * 100).toFixed(0)}%
-            </motion.span>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number"
+                min="5"
+                max="100"
+                step="1"
+                value={(maxWeight * 100).toFixed(0)}
+                onChange={e => {
+                  const v = parseInt(e.target.value);
+                  if (!isNaN(v) && v >= 5 && v <= 100) setMaxWeight(v / 100);
+                }}
+                className="w-12 bg-transparent text-right font-mono text-sm text-nb-text border border-nb-border focus:border-nb-cyan outline-none px-1"
+              />
+              <span className="font-mono text-xs text-nb-muted">%</span>
+            </div>
           </div>
           <input type="range" min="5" max="100" step="5"
                  value={maxWeight * 100}

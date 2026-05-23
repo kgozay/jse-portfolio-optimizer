@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 
-export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onChange }) {
+export function WeightBar({ ticker, weight, riskContrib, delay = 0, isAdjusting = false, onChange }) {
+  const riskOverweight = riskContrib !== undefined && !isAdjusting && riskContrib > weight + 0.005;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 14 }}
@@ -8,7 +10,18 @@ export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onCh
       transition={{ delay, duration: 0.25 }}
       className="flex items-center gap-2 py-1"
     >
-      <span className="font-mono text-[10px] text-nb-muted w-8 shrink-0">{ticker}</span>
+      <div className="w-8 shrink-0">
+        <div className="font-mono text-[10px] text-nb-muted">{ticker}</div>
+        {riskContrib !== undefined && !isAdjusting && (
+          <div
+            className={`font-mono text-[7px] ${riskOverweight ? 'text-nb-amber' : 'text-nb-dim'}`}
+            title="Marginal risk contribution"
+          >
+            ρ{(riskContrib * 100).toFixed(1)}%
+          </div>
+        )}
+      </div>
+
       {isAdjusting ? (
         <input
           type="range"
@@ -32,6 +45,7 @@ export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onCh
           />
         </div>
       )}
+
       <span className="font-mono text-[10px] text-nb-text w-12 text-right">
         {(weight * 100).toFixed(1)}%
       </span>

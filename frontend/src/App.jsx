@@ -4,6 +4,7 @@ import axios from 'axios';
 import { StageInput } from './components/StageInput';
 import { StageCompute } from './components/StageCompute';
 import { StageOutput } from './components/StageOutput';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { ColdStartBanner } from './components/ColdStartBanner';
 import { useOptimizer } from './hooks/useOptimizer';
 import { useRfRate } from './hooks/useRfRate';
@@ -123,13 +124,15 @@ export default function App() {
 
           <AnimatePresence>
             {result && status === 'done' && (
-              <StageOutput 
-                result={result} 
-                runId={runId} 
-                backtestResult={backtestResult} 
-                backtestStatus={backtestStatus}
-                isActive={stage3Active}
-              />
+              <ErrorBoundary label="STAGE 03 OUTPUT ERROR">
+                <StageOutput
+                  result={result}
+                  runId={runId}
+                  backtestResult={backtestResult}
+                  backtestStatus={backtestStatus}
+                  isActive={stage3Active}
+                />
+              </ErrorBoundary>
             )}
           </AnimatePresence>
         </div>

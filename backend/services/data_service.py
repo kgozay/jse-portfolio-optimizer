@@ -4,18 +4,26 @@ import asyncio
 import os
 import time
 import random
+import threading
 
 TIMEOUT = int(os.getenv("YFINANCE_TIMEOUT", "20"))
 
 _CACHE_TTL = 14400  # 4 hours
 _price_cache: dict = {}  # (ticker, period) -> (series, fetched_at)
+_cache_lock = threading.Lock()
 
 
 def _get_cached(key):
-    entry = _price_cache.get(key)
+    with _cache_lock:
+        entry = _price_cache.get(key)
     if entry and (time.time() - entry[1]) < _CACHE_TTL:
         return entry[0]
     return None
+
+
+def _set_cached(key, value):
+    with _cache_lock:
+        _price_cache[key] = (value, time.time())
 
 
 def _fetch_ticker_history(formatted_ticker: str, period: str) -> pd.Series:
@@ -38,7 +46,7 @@ def _fetch_ticker_history(formatted_ticker: str, period: str) -> pd.Series:
                 raise ValueError(
                     f"{formatted_ticker.replace('.JO', '')} has insufficient history (< 50 rows)."
                 )
-            _price_cache[key] = (close, time.time())
+            _set_cached(key, close)
             return close
         except Exception as e:
             msg = str(e).lower()
@@ -55,15 +63,19 @@ async def fetch_prices(tickers: list[str], period: str = "3y") -> tuple[pd.DataF
     loop = asyncio.get_running_loop()
     formatted = [f"{t}.JO" for t in tickers]
 
-    prices_dict = {}
-    dropped = []
-    for ticker, ft in zip(tickers, formatted):
-        try:
-            series = await loop.run_in_executor(None, _fetch_ticker_history, ft, period)
-            prices_dict[ft] = series
-        except Exception:
-            dropped.append(ticker)
-        await asyncio.sleep(0.5)
+    prices_dict: dict = {}
+    dropped: list[str] = []
+    sem = asyncio.Semaphore(3)
+
+    async def fetch_one(ticker: str, ft: str) -> None:
+        async with sem:
+            try:
+                series = await loop.run_in_executor(None, _fetch_ticker_history, ft, period)
+                prices_dict[ft] = series
+            except Exception:
+                dropped.append(ticker)
+
+    await asyncio.gather(*[fetch_one(t, ft) for t, ft in zip(tickers, formatted)])
 
     if len(prices_dict) < 3:
         raise ValueError(
@@ -88,37 +100,61 @@ async def fetch_single(ticker: str, period: str = "3y") -> pd.Series:
 
 
 JSE_TICKERS = {
+    # Technology
     "NPN": "Naspers Limited",
     "PRX": "Prosus NV",
+    # Resources
     "BHP": "BHP Group Limited",
     "AGL": "Anglo American PLC",
     "SOL": "Sasol Limited",
-    "SBK": "Standard Bank Group",
-    "FSR": "Firstrand Limited",
-    "NED": "Nedbank Group",
-    "ABG": "Absa Group Limited",
-    "DSY": "Discovery Limited",
-    "SLM": "Sanlam Limited",
-    "SHP": "Shoprite Holdings",
-    "PIK": "Pick n Pay Stores",
-    "WHL": "Woolworths Holdings",
-    "MRP": "Mr Price Group",
-    "TFG": "The Foschini Group",
-    "TRU": "Truworths International",
-    "MTN": "MTN Group Limited",
-    "VOD": "Vodacom Group Limited",
     "GFI": "Gold Fields Limited",
     "HAR": "Harmony Gold Mining",
     "AMS": "Anglo American Platinum",
     "IMP": "Impala Platinum Holdings",
     "SSW": "Sibanye Stillwater",
     "SAP": "Sappi Limited",
-    "APN": "Aspen Pharmacare",
-    "BTI": "British American Tobacco",
+    "EXX": "Exxaro Resources",
+    "KIO": "Kumba Iron Ore",
+    "MNP": "Mondi PLC",
+    # Financials
+    "SBK": "Standard Bank Group",
+    "FSR": "Firstrand Limited",
+    "NED": "Nedbank Group",
+    "ABG": "Absa Group Limited",
+    "DSY": "Discovery Limited",
+    "SLM": "Sanlam Limited",
     "CPI": "Capitec Bank Holdings",
     "REM": "Remgro Limited",
     "OML": "Old Mutual Limited",
-    "OMU": "Old Mutual Limited"
+    "SNT": "Santam Limited",
+    # Consumer Staples
+    "SHP": "Shoprite Holdings",
+    "PIK": "Pick n Pay Stores",
+    "WHL": "Woolworths Holdings",
+    "CLS": "Clicks Group Limited",
+    "AVI": "AVI Limited",
+    "BID": "Bid Corporation Limited",
+    "SPP": "The Spar Group",
+    # Consumer Discretionary
+    "MRP": "Mr Price Group",
+    "TFG": "The Foschini Group",
+    "TRU": "Truworths International",
+    "PPH": "Pepkor Holdings",
+    "ITU": "Italtile Limited",
+    "CFR": "Compagnie Financiere Richemont SA",
+    # Telecommunications
+    "MTN": "MTN Group Limited",
+    "VOD": "Vodacom Group Limited",
+    "MCG": "MultiChoice Group",
+    "TKG": "Telkom SA SOC",
+    # Industrials
+    "APN": "Aspen Pharmacare",
+    "BTI": "British American Tobacco",
+    "WBO": "Wilson Bayly Holmes-Ovcon",
+    # Real Estate
+    "GRT": "Growthpoint Properties",
+    "RDF": "Redefine Properties",
+    "SRE": "Sirius Real Estate",
 }
 
 

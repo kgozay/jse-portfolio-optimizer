@@ -32,15 +32,19 @@ export function FrontierChart({ result, customPoint }) {
   useEffect(() => {
     if (!result) return;
     setVisibleMcPoints([]);
-    let i = 0;
-    const BATCH = 60;
+    const BATCH = 100;
     const total = result.monte_carlo.length;
-    const timer = setInterval(() => {
-      setVisibleMcPoints(result.monte_carlo.slice(0, Math.min(i + BATCH, total)));
+    let i = 0;
+    let frameId;
+    const animate = () => {
       i += BATCH;
-      if (i >= total) clearInterval(timer);
-    }, 40);
-    return () => clearInterval(timer);
+      setVisibleMcPoints(result.monte_carlo.slice(0, Math.min(i, total)));
+      if (i < total) {
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+    frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
   }, [result]);
 
   return (
