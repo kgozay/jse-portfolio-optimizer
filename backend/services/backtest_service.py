@@ -73,10 +73,12 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str,
     max_drawdown = float(drawdown.min() * 100)
     
     # Calculate Sortino Ratio (downside risk-adjusted return relative to risk-free rate)
-    downside_returns = portfolio_returns[portfolio_returns < 0]
-    downside_deviation = float(np.sqrt((downside_returns ** 2).mean()) * np.sqrt(252)) if len(downside_returns) > 0 else 1e-8
-    avg_daily_return = portfolio_returns.mean()
-    ann_return = float((1 + avg_daily_return) ** 252 - 1)
+    daily_rf = rf_rate / 252
+    downside_diff = np.minimum(0, portfolio_returns - daily_rf)
+    downside_deviation = float(np.sqrt(np.mean(downside_diff ** 2) * 252))
+    
+    # Calculate Portfolio Annual Return (CAGR)
+    ann_return = float((1 + portfolio_returns).prod() ** (252 / len(portfolio_returns)) - 1)
     sortino_ratio = (ann_return - rf_rate) / downside_deviation if downside_deviation > 0 else 0.0
     
     # Calculate Portfolio Beta relative to the Benchmark

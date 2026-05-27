@@ -25,22 +25,25 @@ def run_optimization(prices: pd.DataFrame, request, rf_rate: float) -> dict:
         best_weights = None
         
         if mu_max > rf_rate:
-            for target in np.linspace(rf_rate + 0.002, mu_max - 0.002, 30):
-                try:
-                    es = EfficientSemivariance(mu, returns, weight_bounds=(0.0, request.max_weight))
-                    es.efficient_return(target)
-                    w_opt = es.clean_weights()
-                    perf_es = es.portfolio_performance(risk_free_rate=rf_rate)
-                    sortino = perf_es[2]
-                    if sortino > best_sortino:
-                        best_sortino = sortino
-                        best_weights = w_opt
-                except Exception:
-                    continue
+            target_min = rf_rate + 1e-4
+            target_max = mu_max - 1e-4
+            if target_max > target_min:
+                for target in np.linspace(target_min, target_max, 30):
+                    try:
+                        es = EfficientSemivariance(mu, returns, benchmark=rf_rate / 252, weight_bounds=(0.0, request.max_weight))
+                        es.efficient_return(target)
+                        w_opt = es.clean_weights()
+                        perf_es = es.portfolio_performance(risk_free_rate=rf_rate)
+                        sortino = perf_es[2]
+                        if sortino > best_sortino:
+                            best_sortino = sortino
+                            best_weights = w_opt
+                    except Exception:
+                        continue
         
         if best_weights is None:
             try:
-                es = EfficientSemivariance(mu, returns, weight_bounds=(0.0, request.max_weight))
+                es = EfficientSemivariance(mu, returns, benchmark=rf_rate / 252, weight_bounds=(0.0, request.max_weight))
                 es.min_semivariance()
                 weights = es.clean_weights()
             except Exception as e:
@@ -185,7 +188,7 @@ def _frontier_line(mu, S, returns, rf: float, max_weight: float, objective: str,
     for target in np.linspace(mu_min + 0.001, mu_max - 0.001, n_points):
         try:
             if objective == "max_sortino":
-                es = EfficientSemivariance(mu, returns, weight_bounds=(0.0, max_weight))
+                es = EfficientSemivariance(mu, returns, benchmark=rf / 252, weight_bounds=(0.0, max_weight))
                 es.efficient_return(target)
                 w = es.clean_weights()
                 w_arr = np.array([w.get(t, 0.0) for t in returns.columns])
