@@ -140,7 +140,7 @@ async def validate_ticker(ticker: str) -> dict:
     try:
         info = await loop.run_in_executor(None, lambda: yf.Ticker(formatted).fast_info)
         # Accessing 'currency' forces yfinance to fetch metadata, raising an exception if the ticker is invalid/delisted
-        currency = await loop.run_in_executor(None, lambda: info.get("currency"))
+        currency = await loop.run_in_executor(None, lambda: getattr(info, 'currency', None))
         if not currency:
             raise ValueError("Symbol not found or delisted")
         return {"valid": True, "ticker": ticker_clean,
