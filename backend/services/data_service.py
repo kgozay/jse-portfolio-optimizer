@@ -18,6 +18,26 @@ def _get_cached(key):
     return None
 
 
+def _clean_price_series(series: pd.Series) -> pd.Series:
+    cleaned = series.copy()
+    n = len(series)
+    if n < 3:
+        return cleaned
+    for i in range(1, n - 1):
+        prev_val = cleaned.iloc[i - 1]
+        curr_val = cleaned.iloc[i]
+        next_val = cleaned.iloc[i + 1]
+        if prev_val <= 0 or next_val <= 0 or curr_val <= 0:
+            continue
+        ratio_prev = curr_val / prev_val
+        ratio_next = curr_val / next_val
+        is_drop = (ratio_prev < 0.15) and (ratio_next < 0.15)
+        is_spike = (ratio_prev > 7.0) and (ratio_next > 7.0)
+        if is_drop or is_spike:
+            cleaned.iloc[i] = (prev_val + next_val) / 2.0
+    return cleaned
+
+
 def _fetch_ticker_history(formatted_ticker: str, period: str) -> pd.Series:
     key = (formatted_ticker, period)
     cached = _get_cached(key)
@@ -38,6 +58,7 @@ def _fetch_ticker_history(formatted_ticker: str, period: str) -> pd.Series:
                 raise ValueError(
                     f"{formatted_ticker.replace('.JO', '')} has insufficient history (< 50 rows)."
                 )
+            close = _clean_price_series(close)
             _price_cache[key] = (close, time.time())
             return close
         except Exception as e:
