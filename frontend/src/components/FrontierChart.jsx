@@ -44,7 +44,7 @@ export function FrontierChart({ result, customPoint }) {
   }, [result]);
 
   return (
-    <ResponsiveContainer width="100%" height={260}>
+    <ResponsiveContainer width="100%" height={340}>
       <ScatterChart margin={{ top: 12, right: 12, bottom: 24, left: 36 }}>
         <CartesianGrid stroke="#191919" strokeDasharray="none" />
         <XAxis dataKey="vol" tickFormatter={v => `${(v*100).toFixed(0)}%`}

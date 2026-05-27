@@ -87,7 +87,7 @@ export function BacktestChart({ backtestResult }) {
       </div>
 
       {/* Equity curve chart */}
-      <ResponsiveContainer width="100%" height={210}>
+      <ResponsiveContainer width="100%" height={280}>
         <LineChart data={chartData} margin={{ top: 12, right: 12, bottom: 8, left: 16 }}>
           <CartesianGrid stroke="#191919" strokeDasharray="none" />
           <XAxis 

@@ -150,15 +150,15 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
               <CorrelationMatrix result={result} />
             )}
             {activeTab === 'backtest' && (
-              <div className="min-h-[260px]">
+              <div className="min-h-[340px]">
                 {backtestStatus === 'loading' && (
-                  <div className="h-[210px] flex flex-col items-center justify-center font-mono text-[10px] text-nb-muted gap-2">
+                  <div className="h-[280px] flex flex-col items-center justify-center font-mono text-[10px] text-nb-muted gap-2">
                     <span className="animate-spin inline-block w-4 h-4 border border-nb-muted border-t-transparent rounded-full" />
                     <span>FETCHING BENCHMARK & SIMULATING...</span>
                   </div>
                 )}
                 {backtestStatus === 'error' && (
-                  <div className="h-[210px] flex items-center justify-center font-mono text-[10px] text-nb-red">
+                  <div className="h-[280px] flex items-center justify-center font-mono text-[10px] text-nb-red">
                     ⚠ ERROR LOADNG BACKTEST DATA
                   </div>
                 )}
