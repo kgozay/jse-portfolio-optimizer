@@ -87,7 +87,11 @@ export function StageCompute({
         <div className="flex justify-between items-center">
           <span className="font-mono text-[9px] tracking-widest text-nb-muted">OPTIMIZATION TARGET</span>
           <div className="flex gap-1.5">
-            {[['max_sharpe','MAX SHARPE'],['min_volatility','MIN VOLATILITY']].map(([val, label]) => (
+            {[
+              ['max_sharpe', 'MAX SHARPE'],
+              ['min_volatility', 'MIN VOLATILITY'],
+              ['max_sortino', 'MAX SORTINO']
+            ].map(([val, label]) => (
               <button key={val} onClick={() => setObjective(val)}
                       className={`font-mono text-[9px] px-2 py-1 border transition-all nb-pop-btn ${
                         objective === val 

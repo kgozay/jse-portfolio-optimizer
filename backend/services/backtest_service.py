@@ -4,7 +4,7 @@ import numpy as np
 import asyncio
 
 
-async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str) -> dict:
+async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str, rf_rate: float = 0.105) -> dict:
     loop = asyncio.get_running_loop()
 
     w = pd.Series({f"{k}.JO": v for k, v in weights.items()})
@@ -72,12 +72,12 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str)
     drawdown = (portfolio_curve - cum_max) / cum_max
     max_drawdown = float(drawdown.min() * 100)
     
-    # Calculate Sortino Ratio (downside risk-adjusted return relative to 0.105 risk-free rate)
+    # Calculate Sortino Ratio (downside risk-adjusted return relative to risk-free rate)
     downside_returns = portfolio_returns[portfolio_returns < 0]
     downside_deviation = float(np.sqrt((downside_returns ** 2).mean()) * np.sqrt(252)) if len(downside_returns) > 0 else 1e-8
     avg_daily_return = portfolio_returns.mean()
     ann_return = float((1 + avg_daily_return) ** 252 - 1)
-    sortino_ratio = (ann_return - 0.105) / downside_deviation if downside_deviation > 0 else 0.0
+    sortino_ratio = (ann_return - rf_rate) / downside_deviation if downside_deviation > 0 else 0.0
     
     # Calculate Portfolio Beta relative to the Benchmark
     benchmark_returns = benchmark_aligned.pct_change().dropna()

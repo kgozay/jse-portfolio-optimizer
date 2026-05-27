@@ -56,7 +56,12 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
   };
 
   const customMetrics = useMemo(() => {
-    if (!isAdjusting || !result?.asset_returns || !result?.covariance) return null;
+    if (!isAdjusting || !result?.asset_returns) return null;
+    
+    const isSortino = result.objective === 'max_sortino';
+    const riskMatrix = isSortino ? (result.semicovariance || result.covariance) : result.covariance;
+    
+    if (!riskMatrix) return null;
     
     let expectedReturn = 0;
     let variance = 0;
@@ -69,27 +74,44 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
       
       tickersList.forEach(t2 => {
         const w2 = manualWeights[t2] || 0;
-        const covVal = result.covariance[t1]?.[t2] || 0;
+        const covVal = riskMatrix[t1]?.[t2] || 0;
         variance += w1 * w2 * covVal;
       });
     });
     
-    const volatility = Math.sqrt(variance);
-    const sharpeRatio = volatility > 0 ? (expectedReturn - rfRate) / volatility : 0;
+    const riskValue = Math.sqrt(variance);
+    const ratio = riskValue > 0 ? (expectedReturn - rfRate) / riskValue : 0;
     
     return {
       expected_return: expectedReturn,
-      volatility,
-      sharpe_ratio: sharpeRatio
+      risk_value: riskValue,
+      ratio: ratio
     };
   }, [isAdjusting, manualWeights, result, rfRate]);
 
   if (!result) return null;
 
+  const isSortino = result.objective === 'max_sortino';
+
   const displayReturn = isAdjusting && customMetrics ? customMetrics.expected_return : result.expected_return;
-  const displayVolatility = isAdjusting && customMetrics ? customMetrics.volatility : result.volatility;
-  const displaySharpe = isAdjusting && customMetrics ? customMetrics.sharpe_ratio : result.sharpe_ratio;
-  const lowSharpe = displaySharpe < 0.5;
+  
+  const displayVolatility = isAdjusting && customMetrics 
+    ? (isSortino ? result.volatility : customMetrics.risk_value)
+    : result.volatility;
+    
+  const displayDownsideRisk = isAdjusting && customMetrics
+    ? (isSortino ? customMetrics.risk_value : (result.downside_risk ?? 0))
+    : (result.downside_risk ?? 0);
+
+  const displaySharpe = isAdjusting && customMetrics
+    ? (isSortino ? result.sharpe_ratio : customMetrics.ratio)
+    : result.sharpe_ratio;
+
+  const displaySortino = isAdjusting && customMetrics
+    ? (isSortino ? customMetrics.ratio : (result.sortino_ratio ?? 0))
+    : (result.sortino_ratio ?? 0);
+
+  const lowRatio = isSortino ? displaySortino < 0.7 : displaySharpe < 0.5;
 
   const exportResult = {
     ...result,
@@ -100,7 +122,9 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
     })),
     expected_return: displayReturn,
     volatility: displayVolatility,
-    sharpe_ratio: displaySharpe
+    downside_risk: displayDownsideRisk,
+    sharpe_ratio: displaySharpe,
+    sortino_ratio: displaySortino
   };
 
   return (
@@ -143,7 +167,10 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
             {activeTab === 'frontier' && (
               <FrontierChart 
                 result={result} 
-                customPoint={isAdjusting && customMetrics ? { vol: displayVolatility, ret: displayReturn } : null}
+                customPoint={isAdjusting && customMetrics ? { 
+                  vol: isSortino ? displayDownsideRisk : displayVolatility, 
+                  ret: displayReturn 
+                } : null}
               />
             )}
             {activeTab === 'correlation' && (
@@ -174,8 +201,18 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-2">
               <MetricCard label="EXP. RETURN" value={displayReturn * 100} runId={runId} />
-              <MetricCard label="VOLATILITY"  value={displayVolatility * 100}      runId={runId} />
-              <MetricCard label="SHARPE RATIO" value={displaySharpe} suffix="" runId={runId} isWarning={lowSharpe} />
+              <MetricCard 
+                label={isSortino ? "DOWNSIDE RISK" : "VOLATILITY"}  
+                value={(isSortino ? displayDownsideRisk : displayVolatility) * 100}      
+                runId={runId} 
+              />
+              <MetricCard 
+                label={isSortino ? "SORTINO RATIO" : "SHARPE RATIO"} 
+                value={isSortino ? displaySortino : displaySharpe} 
+                suffix="" 
+                runId={runId} 
+                isWarning={lowRatio} 
+              />
             </div>
 
             {/* Adjust Weights Toggle Widget */}

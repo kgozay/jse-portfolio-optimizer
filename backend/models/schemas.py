@@ -8,7 +8,7 @@ class OptimizeRequest(BaseModel):
     max_weight: float = Field(0.40, ge=0.05, le=1.0)
     estimator: str = Field("ledoit_wolf", pattern="^(ledoit_wolf|sample)$")
     n_simulations: int = Field(5000, ge=1000, le=10000)
-    objective: str = Field("max_sharpe", pattern="^(max_sharpe|min_volatility)$")
+    objective: str = Field("max_sharpe", pattern="^(max_sharpe|min_volatility|max_sortino)$")
 
     @field_validator("tickers")
     @classmethod
@@ -36,6 +36,8 @@ class OptimizeResponse(BaseModel):
     expected_return: float
     volatility: float
     sharpe_ratio: float
+    sortino_ratio: float
+    downside_risk: float
     monte_carlo: list[dict]
     frontier: list[dict]
     optimal_point: dict
@@ -45,3 +47,5 @@ class OptimizeResponse(BaseModel):
     tickers_dropped: list[str]
     duration_ms: int
     weights_sum_check: float
+    semicovariance: dict[str, dict[str, float]]
+    objective: str

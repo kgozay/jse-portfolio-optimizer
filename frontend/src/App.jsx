@@ -92,7 +92,11 @@ export default function App() {
         <header className="mb-8">
           <h1 className="font-mono text-xl tracking-wide text-nb-text">JSE PORTFOLIO OPTIMIZER</h1>
           <p className="font-mono text-xs text-nb-muted mt-2">
-            MAXIMUM SHARPE RATIO · EFFICIENT FRONTIER MODELING
+            {objective === 'max_sortino' 
+              ? 'MAXIMUM SORTINO RATIO · MEAN-SEMIVARIANCE MODELING' 
+              : objective === 'min_volatility'
+                ? 'MINIMUM VOLATILITY · EFFICIENT FRONTIER MODELING'
+                : 'MAXIMUM SHARPE RATIO · MEAN-VARIANCE MODELING'}
           </p>
         </header>
 

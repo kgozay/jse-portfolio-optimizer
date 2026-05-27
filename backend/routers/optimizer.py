@@ -131,6 +131,6 @@ async def backtest(request: OptimizeRequest):
         rf = await rf_service.get_rf_rate()
         result = optimizer_service.run_optimization(prices, request, rf["rate"])
         weights = {w["ticker"]: w["weight"] for w in result["weights"]}
-        return await compute_equity_curve(prices, weights, request.period)
+        return await compute_equity_curve(prices, weights, request.period, rf["rate"])
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

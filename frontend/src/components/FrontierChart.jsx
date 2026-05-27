@@ -4,23 +4,26 @@ import {
   Tooltip, ReferenceLine, ResponsiveContainer
 } from 'recharts';
 
-function PortfolioTooltip({ active, payload, rfRate }) {
+function PortfolioTooltip({ active, payload, rfRate, isSortino }) {
   if (!active || !payload?.length) return null;
-  const { ret, vol, sharpe } = payload[0].payload;
+  const { ret, vol, sharpe, sortino } = payload[0].payload;
   
-  let computedSharpe = sharpe;
-  if (computedSharpe === undefined && vol > 0) {
+  let ratioVal = isSortino ? (sortino ?? sharpe) : (sharpe ?? sortino);
+  if (ratioVal === undefined && vol > 0) {
     const rf = rfRate ?? 0.105;
-    computedSharpe = (ret - rf) / vol;
+    ratioVal = (ret - rf) / vol;
   }
 
   return (
-    <div className="border-2 border-nb-border bg-nb-bg font-mono text-[10px] px-3 py-2">
+    <div className="border-2 border-nb-border bg-nb-bg font-mono text-[10px] px-3 py-2 space-y-0.5">
       <div className="flex gap-3"><span className="text-nb-dim">RET</span><span className="text-nb-emerald">{(ret*100).toFixed(2)}%</span></div>
-      <div className="flex gap-3"><span className="text-nb-dim">VOL</span><span className="text-nb-text">{(vol*100).toFixed(2)}%</span></div>
       <div className="flex gap-3">
-        <span className="text-nb-dim">SR </span>
-        <span className="text-nb-cyan">{computedSharpe !== undefined ? computedSharpe.toFixed(3) : 'N/A'}</span>
+        <span className="text-nb-dim">{isSortino ? 'DSK' : 'VOL'}</span>
+        <span className="text-nb-text">{(vol*100).toFixed(2)}%</span>
+      </div>
+      <div className="flex gap-3">
+        <span className="text-nb-dim">{isSortino ? 'SOR' : 'SR '}</span>
+        <span className="text-nb-cyan">{ratioVal !== undefined ? ratioVal.toFixed(3) : 'N/A'}</span>
       </div>
     </div>
   );
@@ -28,6 +31,7 @@ function PortfolioTooltip({ active, payload, rfRate }) {
 
 export function FrontierChart({ result, customPoint }) {
   const [visibleMcPoints, setVisibleMcPoints] = useState([]);
+  const isSortino = result?.objective === 'max_sortino';
 
   useEffect(() => {
     if (!result) return;
@@ -51,7 +55,7 @@ export function FrontierChart({ result, customPoint }) {
                tick={{ fill: '#404040', fontSize: 9, fontFamily: 'monospace' }} />
         <YAxis dataKey="ret" tickFormatter={v => `${(v*100).toFixed(0)}%`}
                tick={{ fill: '#404040', fontSize: 9, fontFamily: 'monospace' }} />
-        <Tooltip content={<PortfolioTooltip rfRate={result?.rf_rate_used} />} />
+        <Tooltip content={<PortfolioTooltip rfRate={result?.rf_rate_used} isSortino={isSortino} />} />
         <ReferenceLine x={result.optimal_point.vol} stroke="rgba(0,200,83,0.25)" strokeDasharray="4 4" strokeWidth={0.75} />
         <ReferenceLine y={result.optimal_point.ret} stroke="rgba(0,200,83,0.25)" strokeDasharray="4 4" strokeWidth={0.75} />
         <Scatter data={visibleMcPoints} fill="rgba(0,190,220,0.22)" />
