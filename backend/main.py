@@ -20,7 +20,7 @@ origins = list(filter(None, env_origins + ["http://localhost:5173"]))
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origin_regex=r"https://.*\.vercel\.app$",
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
     # allow_credentials intentionally omitted — no cookies used
