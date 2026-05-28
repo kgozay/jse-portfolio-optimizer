@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import axios from 'axios';
 import { StageInput } from './components/StageInput';
 import { StageCompute } from './components/StageCompute';
 import { StageOutput } from './components/StageOutput';
 import { ColdStartBanner } from './components/ColdStartBanner';
+import { LandingPage } from './components/LandingPage';
 import { useOptimizer } from './hooks/useOptimizer';
 import { useRfRate } from './hooks/useRfRate';
 import { API_URL, DEFAULT_MAX_WEIGHT, DEFAULT_PERIOD, DEFAULT_ESTIMATOR, DEFAULT_N_SIMS } from './lib/constants';
@@ -12,8 +13,11 @@ import { API_URL, DEFAULT_MAX_WEIGHT, DEFAULT_PERIOD, DEFAULT_ESTIMATOR, DEFAULT
 export default function App() {
   const [tickers, setTickers] = useState([]);
   const [runId, setRunId] = useState(0);
+  const [showApp, setShowApp] = useState(false);
   const { rfData } = useRfRate();
   const { optimize, logs, result, status } = useOptimizer();
+
+  const validCount = tickers.filter(t => t.status === 'valid').length;
 
   // Lifted parameters state
   const [rfOverride, setRfOverride] = useState(null);
@@ -79,70 +83,93 @@ export default function App() {
     }
   }, [status, result]);
 
-  const optimizeDisabled = tickers.filter(t => t.status === 'valid').length < 3 || status === 'running';
+  const optimizeDisabled = validCount < 3 || status === 'running';
 
   // Determine active stages for cyber-border glow
-  const stage1Active = status !== 'running' && status !== 'done' && tickers.filter(t => t.status === 'valid').length < 3;
-  const stage2Active = status === 'running' || (status === 'idle' && tickers.filter(t => t.status === 'valid').length >= 3);
+  const stage1Active = status !== 'running' && status !== 'done' && validCount < 3;
+  const stage2Active = status === 'running' || (status === 'idle' && validCount >= 3);
   const stage3Active = status === 'done';
 
   return (
-    <div className="min-h-screen bg-nb-bg text-nb-text p-4 md:p-8 flex justify-center pb-24">
-      <div className="w-full max-w-2xl">
-        <header className="mb-8">
-          <h1 className="font-mono text-xl tracking-wide text-nb-text">JSE PORTFOLIO OPTIMIZER</h1>
-          <p className="font-mono text-xs text-nb-muted mt-2">
-            {objective === 'max_sortino' 
-              ? 'MAXIMUM SORTINO RATIO · MEAN-SEMIVARIANCE MODELING' 
-              : objective === 'min_volatility'
-                ? 'MINIMUM VOLATILITY · EFFICIENT FRONTIER MODELING'
-                : 'MAXIMUM SHARPE RATIO · MEAN-VARIANCE MODELING'}
-          </p>
-        </header>
+    <AnimatePresence mode="wait">
+      {!showApp ? (
+        <motion.div
+          key="landing"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.3 }}
+          className="w-full animate-fade"
+        >
+          <LandingPage onLaunch={() => setShowApp(true)} />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="app"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full flex justify-center"
+        >
+          <div className="min-h-screen bg-nb-bg text-nb-text p-4 md:p-8 flex justify-center pb-24 w-full">
+            <div className="w-full max-w-2xl">
+              <header className="mb-8">
+                <h1 className="font-mono text-xl tracking-wide text-nb-text">JSE PORTFOLIO OPTIMIZER</h1>
+                <p className="font-mono text-xs text-nb-muted mt-2">
+                  {objective === 'max_sortino' 
+                    ? 'MAXIMUM SORTINO RATIO · MEAN-SEMIVARIANCE MODELING' 
+                    : objective === 'min_volatility'
+                      ? 'MINIMUM VOLATILITY · EFFICIENT FRONTIER MODELING'
+                      : 'MAXIMUM SHARPE RATIO · MEAN-VARIANCE MODELING'}
+                </p>
+              </header>
 
-        <ColdStartBanner />
+              <ColdStartBanner />
 
-        <div className="flex flex-col mt-6">
-          <StageInput 
-            tickers={tickers} 
-            setTickers={setTickers} 
-            onOptimize={handleOptimize}
-            optimizeDisabled={optimizeDisabled} 
-            isActive={stage1Active}
-          />
-          
-          <StageCompute 
-            rfData={rfData}
-            logs={logs}
-            status={status}
-            rfOverride={rfOverride}
-            setRfOverride={setRfOverride}
-            period={period}
-            setPeriod={setPeriod}
-            maxWeight={maxWeight}
-            setMaxWeight={setMaxWeight}
-            estimator={estimator}
-            setEstimator={setEstimator}
-            nSims={nSims}
-            setNSims={setNSims}
-            objective={objective}
-            setObjective={setObjective}
-            isActive={stage2Active}
-          />
+              <div className="flex flex-col mt-6">
+                <StageInput 
+                  tickers={tickers} 
+                  setTickers={setTickers} 
+                  onOptimize={handleOptimize}
+                  optimizeDisabled={optimizeDisabled} 
+                  isActive={stage1Active}
+                />
+                
+                <StageCompute 
+                  rfData={rfData}
+                  logs={logs}
+                  status={status}
+                  rfOverride={rfOverride}
+                  setRfOverride={setRfOverride}
+                  period={period}
+                  setPeriod={setPeriod}
+                  maxWeight={maxWeight}
+                  setMaxWeight={setMaxWeight}
+                  estimator={estimator}
+                  setEstimator={setEstimator}
+                  nSims={nSims}
+                  setNSims={setNSims}
+                  objective={objective}
+                  setObjective={setObjective}
+                  isActive={stage2Active}
+                  locked={validCount === 0}
+                />
 
-          <AnimatePresence>
-            {result && status === 'done' && (
-              <StageOutput 
-                result={result} 
-                runId={runId} 
-                backtestResult={backtestResult} 
-                backtestStatus={backtestStatus}
-                isActive={stage3Active}
-              />
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
+                <AnimatePresence>
+                  {result && status === 'done' && (
+                    <StageOutput 
+                      result={result} 
+                      runId={runId} 
+                      backtestResult={backtestResult} 
+                      backtestStatus={backtestStatus}
+                      isActive={stage3Active}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

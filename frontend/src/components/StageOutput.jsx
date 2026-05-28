@@ -186,7 +186,7 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
                 )}
                 {backtestStatus === 'error' && (
                   <div className="h-[280px] flex items-center justify-center font-mono text-[10px] text-nb-red">
-                    ⚠ ERROR LOADNG BACKTEST DATA
+                    ⚠ ERROR LOADING BACKTEST DATA
                   </div>
                 )}
                 {backtestStatus === 'done' && backtestResult && (
@@ -255,9 +255,17 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
             </div>
 
             {result.tickers_dropped?.length > 0 && (
-              <p className="font-mono text-[9px] text-nb-amber">
-                ⚠ Dropped: {result.tickers_dropped.join(', ')} — insufficient history
-              </p>
+              <div className="border border-nb-amber p-2.5 mt-2">
+                <p className="font-mono text-[8px] text-nb-amber tracking-widest mb-1">
+                  ⚠ WARNING — TICKERS DROPPED
+                </p>
+                <p className="font-mono text-[8px] text-nb-amber/70 leading-relaxed">
+                  {result.tickers_dropped.join(', ')} — insufficient price history
+                  (&lt; 252 trading days). Optimization ran on remaining {result.weights
+                    ? result.weights.length
+                    : 'available'} tickers.
+                </p>
+              </div>
             )}
 
             <ExportButton result={exportResult} />
