@@ -109,6 +109,7 @@ async def fetch_single(ticker: str, period: str = "3y") -> pd.Series:
 
 
 JSE_TICKERS = {
+    # Original 39
     "NPN": "Naspers Limited",
     "PRX": "Prosus NV",
     "BHP": "BHP Group Limited",
@@ -147,7 +148,59 @@ JSE_TICKERS = {
     "KIO": "Kumba Iron Ore",
     "GRT": "Growthpoint Properties",
     "OUT": "OUTsurance Group",
-    "PPH": "Pepkor Holdings"
+    "PPH": "Pepkor Holdings",
+
+    # Expanded 50 (88 unique total)
+    "CFR": "Compagnie Financiere Richemont SA",
+    "ANG": "AngloGold Ashanti plc",
+    "GLN": "Glencore plc",
+    "MNP": "Mondi plc",
+    "INP": "Investec plc",
+    "INL": "Investec Limited",
+    "ARI": "African Rainbow Minerals",
+    "MCF": "Momentum Metropolitan Holdings",
+    "RDF": "Redefine Properties Limited",
+    "NEPI": "NEPI Rockcastle NV",
+    "RES": "Resilient REIT Limited",
+    "HYP": "Hyprop Investments Limited",
+    "VKE": "Vukile Property Fund",
+    "ATT": "Attacq Limited",
+    "EQU": "Equites Property Fund",
+    "NTC": "Netcare Limited",
+    "LHS": "Life Healthcare Group",
+    "MCG": "MultiChoice Group",
+    "TKG": "Telkom SA SOC Limited",
+    "BLU": "Blue Label Telecoms",
+    "AFT": "Afrimat Limited",
+    "PPC": "PPC Limited",
+    "RLO": "Barloworld Limited",
+    "KAP": "KAP Industrial Holdings",
+    "AVI": "AVI Limited",
+    "TBS": "Tiger Brands Limited",
+    "DGC": "DRDGOLD Limited",
+    "PAN": "Pan African Resources",
+    "THA": "Tharisa plc",
+    "MER": "Merafe Resources",
+    "SPG": "Super Group Limited",
+    "SUI": "Sun International Limited",
+    "TSG": "Tsogo Sun Gaming Limited",
+    "CLH": "City Lodge Hotels Limited",
+    "SPAR": "The Spar Group Limited",
+    "RCL": "RCL Foods Limited",
+    "RFG": "RFG Foods Holdings",
+    "OCE": "Oceana Group Limited",
+    "MOT": "Motus Holdings Limited",
+    "PMG": "Purple Group Limited",
+    "PSG": "PSG Financial Services",
+    "JSE": "JSE Limited",
+    "ZED": "Zeda Limited",
+    "ADH": "ADvTECH Limited",
+    "CUR": "Curro Holdings Limited",
+    "KST": "Karooooo Ltd",
+    "ALH": "Altron Limited",
+    "BYI": "Bytes Technology Group",
+    "SNT": "Santam Limited",
+    "REN": "Renergen Limited"
 }
 
 

@@ -6,7 +6,7 @@ import { StageCompute } from './components/StageCompute';
 import { StageOutput } from './components/StageOutput';
 import { ColdStartBanner } from './components/ColdStartBanner';
 import { LandingPage } from './components/LandingPage';
-import { useOptimizer } from './hooks/useOptimizer';
+import { useOptimiser } from './hooks/useOptimiser';
 import { useRfRate } from './hooks/useRfRate';
 import { API_URL, DEFAULT_MAX_WEIGHT, DEFAULT_PERIOD, DEFAULT_ESTIMATOR, DEFAULT_N_SIMS } from './lib/constants';
 
@@ -15,7 +15,7 @@ export default function App() {
   const [runId, setRunId] = useState(0);
   const [showApp, setShowApp] = useState(false);
   const { rfData } = useRfRate();
-  const { optimize, logs, result, status } = useOptimizer();
+  const { optimise, logs, result, status } = useOptimiser();
 
   const validCount = tickers.filter(t => t.status === 'valid').length;
 
@@ -26,26 +26,28 @@ export default function App() {
   const [estimator, setEstimator] = useState(DEFAULT_ESTIMATOR);
   const [nSims, setNSims] = useState(DEFAULT_N_SIMS);
   const [objective, setObjective] = useState('max_sharpe');
+  const [benchmark, setBenchmark] = useState('J203');
 
   // Backtest state
   const [backtestResult, setBacktestResult] = useState(null);
   const [backtestStatus, setBacktestStatus] = useState('idle'); // idle | loading | done | error
 
-  const handleOptimize = async () => {
+  const handleOptimise = async () => {
     setRunId(id => id + 1);
     
     // Add valid tickers to the request
     const validTickers = tickers.filter(t => t.status === 'valid').map(t => t.ticker);
     const effectiveRfPct = rfOverride ?? rfData?.rate_pct ?? 10.50;
     
-    optimize({
+    optimise({
       tickers: validTickers,
       rf_rate: effectiveRfPct / 100,
       period,
       max_weight: maxWeight,
       estimator,
       n_simulations: nSims,
-      objective
+      objective,
+      benchmark
     });
   };
 
@@ -65,7 +67,8 @@ export default function App() {
             max_weight: maxWeight,
             estimator,
             n_simulations: nSims,
-            objective
+            objective,
+            benchmark
           };
           
           const res = await axios.post(`${API_URL}/backtest`, payload);
@@ -81,9 +84,9 @@ export default function App() {
       setBacktestResult(null);
       setBacktestStatus('idle');
     }
-  }, [status, result]);
+  }, [status, result, benchmark]);
 
-  const optimizeDisabled = validCount < 3 || status === 'running';
+  const optimiseDisabled = validCount < 3 || status === 'running';
 
   // Determine active stages for cyber-border glow
   const stage1Active = status !== 'running' && status !== 'done' && validCount < 3;
@@ -100,7 +103,7 @@ export default function App() {
           transition={{ duration: 0.3 }}
           className="w-full animate-fade"
         >
-          <LandingPage onLaunch={() => setShowApp(true)} />
+          <LandingPage onLaunch={() => setShowApp(true)} rfData={rfData} />
         </motion.div>
       ) : (
         <motion.div
@@ -113,7 +116,7 @@ export default function App() {
           <div className="min-h-screen bg-nb-bg text-nb-text p-4 md:p-8 flex justify-center pb-24 w-full">
             <div className="w-full max-w-2xl">
               <header className="mb-8">
-                <h1 className="font-mono text-xl tracking-wide text-nb-text">JSE PORTFOLIO OPTIMIZER</h1>
+                <h1 className="font-mono text-xl tracking-wide text-nb-text">JSE PORTFOLIO OPTIMISER</h1>
                 <p className="font-mono text-xs text-nb-muted mt-2">
                   {objective === 'max_sortino' 
                     ? 'MAXIMUM SORTINO RATIO · MEAN-SEMIVARIANCE MODELING' 
@@ -129,8 +132,8 @@ export default function App() {
                 <StageInput 
                   tickers={tickers} 
                   setTickers={setTickers} 
-                  onOptimize={handleOptimize}
-                  optimizeDisabled={optimizeDisabled} 
+                  onOptimise={handleOptimise}
+                  optimiseDisabled={optimiseDisabled} 
                   isActive={stage1Active}
                 />
                 
@@ -162,6 +165,8 @@ export default function App() {
                       backtestResult={backtestResult} 
                       backtestStatus={backtestStatus}
                       isActive={stage3Active}
+                      benchmark={benchmark}
+                      setBenchmark={setBenchmark}
                     />
                   )}
                 </AnimatePresence>

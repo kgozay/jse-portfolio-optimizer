@@ -4,7 +4,7 @@ import numpy as np
 import asyncio
 
 
-async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str, rf_rate: float = 0.105) -> dict:
+async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str, rf_rate: float = 0.105, benchmark: str = "J203") -> dict:
     loop = asyncio.get_running_loop()
 
     w = pd.Series({f"{k}.JO": v for k, v in weights.items()})
@@ -29,24 +29,16 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str,
             return df["Close"].dropna()
         return None
 
-    # Try ^J203.JO
-    try:
-        raw = await loop.run_in_executor(
-            None,
-            lambda: yf.download("^J203.JO", period=period, auto_adjust=True, progress=False, group_by="ticker")
-        )
-        series = extract_close(raw)
-        if series is not None and len(series) > 0:
-            benchmark_curve = (series / series.iloc[0]) * 100
-    except Exception:
-        pass
-
-    # Try EZA if ^J203.JO fails
-    if benchmark_curve is None:
+    if benchmark == "EQUAL_WEIGHT":
+        # Mean return of selected active tickers
+        eq_returns = prices.pct_change().dropna().mean(axis=1)
+        benchmark_aligned = (1 + eq_returns).cumprod() * 100
+    else:
+        symbol = "^J203.JO" if benchmark == "J203" else "^J200.JO"
         try:
             raw = await loop.run_in_executor(
                 None,
-                lambda: yf.download("EZA", period=period, auto_adjust=True, progress=False, group_by="ticker")
+                lambda: yf.download(symbol, period=period, auto_adjust=True, progress=False, group_by="ticker")
             )
             series = extract_close(raw)
             if series is not None and len(series) > 0:
@@ -54,15 +46,28 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str,
         except Exception:
             pass
 
-    # Fallback: daily compound return at 8% annualized (assuming 252 trading days/year)
-    if benchmark_curve is None:
-        n_days = len(portfolio_curve)
-        daily_rate = (1 + 0.08) ** (1 / 252) - 1
-        compounded = (1 + daily_rate) ** np.arange(n_days)
-        benchmark_aligned = pd.Series(compounded * 100, index=portfolio_curve.index)
-    else:
-        # Align benchmark to portfolio index
-        benchmark_aligned = benchmark_curve.reindex(portfolio_curve.index, method="ffill").fillna(100)
+        # Try EZA if index download fails
+        if benchmark_curve is None:
+            try:
+                raw = await loop.run_in_executor(
+                    None,
+                    lambda: yf.download("EZA", period=period, auto_adjust=True, progress=False, group_by="ticker")
+                )
+                series = extract_close(raw)
+                if series is not None and len(series) > 0:
+                    benchmark_curve = (series / series.iloc[0]) * 100
+            except Exception:
+                pass
+
+        # Fallback: daily compound return at 8% annualised
+        if benchmark_curve is None:
+            n_days = len(portfolio_curve)
+            daily_rate = (1 + 0.08) ** (1 / 252) - 1
+            compounded = (1 + daily_rate) ** np.arange(n_days)
+            benchmark_aligned = pd.Series(compounded * 100, index=portfolio_curve.index)
+        else:
+            # Align benchmark to portfolio index
+            benchmark_aligned = benchmark_curve.reindex(portfolio_curve.index, method="ffill").fillna(100)
 
     port_ret = (portfolio_curve.iloc[-1] / 100 - 1) * 100
     bench_ret = (benchmark_aligned.iloc[-1] / 100 - 1) * 100

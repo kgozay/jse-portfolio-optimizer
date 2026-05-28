@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
-from routers import optimizer, market, health
+from routers import optimiser, market, health
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -11,7 +11,7 @@ async def lifespan(app: FastAPI):
     print(f"[startup] FRED Rf rate: {rate['rate_pct']}% (source: {rate['source']})")
     yield
 
-app = FastAPI(title="JSE Portfolio Optimizer API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="JSE Portfolio Optimiser API", version="1.0.0", lifespan=lifespan)
 
 # Filter None and support comma-separated CORS origins
 cors_env = os.getenv("CORS_ORIGIN")
@@ -26,6 +26,6 @@ app.add_middleware(
     # allow_credentials intentionally omitted — no cookies used
 )
 
-app.include_router(optimizer.router)
+app.include_router(optimiser.router)
 app.include_router(market.router)
 app.include_router(health.router)

@@ -1,8 +1,8 @@
 import json
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
-from models.schemas import OptimizeRequest
-from services import data_service, optimizer_service, rf_service, sector_service
+from models.schemas import OptimiseRequest
+from services import data_service, optimiser_service, rf_service, sector_service
 
 router = APIRouter()
 
@@ -11,8 +11,8 @@ def sse(event_type: str, data: dict) -> str:
     return f"data: {json.dumps({'type': event_type, **data})}\n\n"
 
 
-@router.post("/optimize/stream")
-async def optimize_stream(request: OptimizeRequest):
+@router.post("/optimise/stream")
+async def optimise_stream(request: OptimiseRequest):
     async def event_generator():
         rf = await rf_service.get_rf_rate()
         yield sse("log", {"msg": f"Rf: {rf['rate_pct']:.2f}% ({rf['source'].upper()})", "status": "ok"})
@@ -59,7 +59,7 @@ async def optimize_stream(request: OptimizeRequest):
         yield sse("log", {"msg": "Building covariance matrix...", "status": "ok"})
 
         try:
-            result = optimizer_service.run_optimization(prices_df, request, rf["rate"])
+            result = optimiser_service.run_optimisation(prices_df, request, rf["rate"])
         except Exception as e:
             yield sse("error", {"msg": str(e)})
             return
@@ -68,7 +68,7 @@ async def optimize_stream(request: OptimizeRequest):
             {w["ticker"]: w["weight"] for w in result["weights"]}
         )
 
-        yield sse("log", {"msg": f"Optimization complete ({result['duration_ms']}ms)", "status": "ok"})
+        yield sse("log", {"msg": f"Optimisation complete ({result['duration_ms']}ms)", "status": "ok"})
         yield sse("done", {
             **result,
             "rf_rate_used": rf["rate"],
@@ -85,8 +85,8 @@ async def optimize_stream(request: OptimizeRequest):
     )
 
 
-@router.post("/optimize")
-async def optimize_json(request: OptimizeRequest):
+@router.post("/optimise")
+async def optimise_json(request: OptimiseRequest):
     """Non-streaming endpoint — use for debugging before the SSE stream is wired up."""
     from fastapi import HTTPException
     rf = await rf_service.get_rf_rate()
@@ -105,7 +105,7 @@ async def optimize_json(request: OptimizeRequest):
         )
 
     try:
-        result = optimizer_service.run_optimization(prices, request, rf["rate"])
+        result = optimiser_service.run_optimisation(prices, request, rf["rate"])
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -123,14 +123,14 @@ async def optimize_json(request: OptimizeRequest):
 
 
 @router.post("/backtest")
-async def backtest(request: OptimizeRequest):
+async def backtest(request: OptimiseRequest):
     from services.backtest_service import compute_equity_curve
     from fastapi import HTTPException
     try:
         prices, _ = await data_service.fetch_prices(request.tickers, request.period)
         rf = await rf_service.get_rf_rate()
-        result = optimizer_service.run_optimization(prices, request, rf["rate"])
+        result = optimiser_service.run_optimisation(prices, request, rf["rate"])
         weights = {w["ticker"]: w["weight"] for w in result["weights"]}
-        return await compute_equity_curve(prices, weights, request.period, rf["rate"])
+        return await compute_equity_curve(prices, weights, request.period, rf["rate"], request.benchmark)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

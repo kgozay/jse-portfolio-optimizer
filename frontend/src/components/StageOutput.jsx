@@ -9,7 +9,7 @@ import { ExportButton } from './ExportButton';
 import { BacktestChart } from './BacktestChart';
 import { CorrelationMatrix } from './CorrelationMatrix';
 
-export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
+export function StageOutput({ result, runId, backtestResult, backtestStatus, isActive, benchmark, setBenchmark }) {
   const [activeTab, setActiveTab] = useState('frontier'); // frontier | backtest
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [manualWeights, setManualWeights] = useState({});
@@ -53,6 +53,15 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
       
       return updated;
     });
+  };
+
+  const handleFrontierClick = (clickedWeights) => {
+    const updated = {};
+    result.weights.forEach(w => {
+      updated[w.ticker] = clickedWeights[w.ticker] ?? 0.0;
+    });
+    setManualWeights(updated);
+    setIsAdjusting(true);
   };
 
   const customMetrics = useMemo(() => {
@@ -133,7 +142,7 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
-      <StageShell number="03" label="OUTPUT" id="stage-output">
+      <StageShell number="03" label="OUTPUT" id="stage-output" isActive={isActive}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             {/* View Switcher Tabs */}
@@ -171,13 +180,28 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
                   vol: isSortino ? displayDownsideRisk : displayVolatility, 
                   ret: displayReturn 
                 } : null}
+                onFrontierClick={handleFrontierClick}
               />
             )}
             {activeTab === 'correlation' && (
               <CorrelationMatrix result={result} />
             )}
             {activeTab === 'backtest' && (
-              <div className="min-h-[340px]">
+              <div className="min-h-[340px] space-y-4 animate-fade">
+                {/* Benchmark Selection Bar */}
+                <div className="flex justify-between items-center border border-nb-border px-3 py-2 bg-nb-surface/40">
+                  <span className="font-mono text-[8px] tracking-widest text-nb-muted uppercase">SELECT BENCHMARK</span>
+                  <select
+                    value={benchmark}
+                    onChange={(e) => setBenchmark(e.target.value)}
+                    className="bg-nb-bg border border-nb-border font-mono text-[9px] text-nb-text px-2 py-0.5 outline-none focus:border-nb-cyan"
+                  >
+                    <option value="J203">JSE TOP 40 INDEX (J203)</option>
+                    <option value="J200">JSE ALL SHARE INDEX (J200)</option>
+                    <option value="EQUAL_WEIGHT">EQUAL-WEIGHTED (1/N)</option>
+                  </select>
+                </div>
+
                 {backtestStatus === 'loading' && (
                   <div className="h-[280px] flex flex-col items-center justify-center font-mono text-[10px] text-nb-muted gap-2">
                     <span className="animate-spin inline-block w-4 h-4 border border-nb-muted border-t-transparent rounded-full" />
@@ -213,6 +237,34 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
                 runId={runId} 
                 isWarning={lowRatio} 
               />
+            </div>
+
+            {/* Advanced Risk Metrics Panel */}
+            <div className="border border-nb-border p-3 bg-nb-surface/10 space-y-2">
+              <div className="font-mono text-[8px] tracking-widest text-nb-dim uppercase">ADVANCED RISK METRICS (HISTORICAL)</div>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <div className="font-mono text-[7px] text-nb-muted uppercase">95% Daily VaR</div>
+                  <div className="font-mono text-xs mt-0.5 text-nb-text font-bold font-mono">
+                    {result.var_value !== undefined ? `${(result.var_value * 100).toFixed(3)}%` : 'N/A'}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-mono text-[7px] text-nb-muted uppercase">95% Daily CVaR</div>
+                  <div className="font-mono text-xs mt-0.5 text-nb-text font-bold font-mono">
+                    {result.cvar_value !== undefined ? `${(result.cvar_value * 100).toFixed(3)}%` : 'N/A'}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-mono text-[7px] text-nb-muted uppercase">Portfolio Beta</div>
+                  <div className="font-mono text-xs mt-0.5 text-nb-cyan font-bold font-mono">
+                    {backtestResult?.beta !== undefined ? backtestResult.beta.toFixed(2) : 'N/A'}
+                  </div>
+                </div>
+              </div>
+              <p className="font-mono text-[7px] text-nb-dim leading-relaxed">
+                Value at Risk (VaR) represents the minimum expected loss over a 1-day horizon at 95% confidence. CVaR (Expected Shortfall) represents the average losses in the worst 5% of trading days. Beta measures market sensitivity relative to the chosen benchmark.
+              </p>
             </div>
 
             {/* Adjust Weights Toggle Widget */}
@@ -261,7 +313,7 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus }) {
                 </p>
                 <p className="font-mono text-[8px] text-nb-amber/70 leading-relaxed">
                   {result.tickers_dropped.join(', ')} — insufficient price history
-                  (&lt; 252 trading days). Optimization ran on remaining {result.weights
+                  (&lt; 252 trading days). Optimisation ran on remaining {result.weights
                     ? result.weights.length
                     : 'available'} tickers.
                 </p>

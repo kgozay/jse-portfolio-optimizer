@@ -1,13 +1,13 @@
 import { useState, useRef } from 'react';
 import { API_URL } from '../lib/constants';
 
-export function useOptimizer() {
+export function useOptimiser() {
   const [logs, setLogs] = useState([]);
   const [result, setResult] = useState(null);
   const [status, setStatus] = useState('idle'); // idle | running | done | error
   const abortRef = useRef(null);
 
-  const optimize = async (payload) => {
+  const optimise = async (payload) => {
     if (abortRef.current) abortRef.current.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -17,7 +17,7 @@ export function useOptimizer() {
     setResult(null);
 
     try {
-      const response = await fetch(`${API_URL}/optimize/stream`, {
+      const response = await fetch(`${API_URL}/optimise/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -63,5 +63,5 @@ export function useOptimizer() {
     setStatus('idle');
   };
 
-  return { optimize, cancel, logs, result, status };
+  return { optimise, cancel, logs, result, status };
 }

@@ -6,7 +6,7 @@ import { TickerAutocomplete } from './TickerAutocomplete';
 import { useTickerValidation } from '../hooks/useTickerValidation';
 import { MIN_TICKERS, MAX_TICKERS } from '../lib/constants';
 
-export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled, isActive }) {
+export function StageInput({ tickers, setTickers, onOptimise, optimiseDisabled, isActive }) {
   const [input, setInput] = useState('');
 
   const handleValidationResult = useCallback((ticker, status, name) => {
@@ -99,7 +99,7 @@ export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled, 
 
       {tickers.length > 0 && tickers.length < MIN_TICKERS && (
         <p className="font-mono text-[9px] text-nb-amber mt-2">
-          Add {MIN_TICKERS - tickers.length} more ticker{MIN_TICKERS - tickers.length > 1 ? 's' : ''} to enable optimization
+          Add {MIN_TICKERS - tickers.length} more ticker{MIN_TICKERS - tickers.length > 1 ? 's' : ''} to enable optimisation
         </p>
       )}
       {tickers.length >= MAX_TICKERS && (
@@ -107,14 +107,14 @@ export function StageInput({ tickers, setTickers, onOptimize, optimizeDisabled, 
       )}
 
       <motion.button
-        onClick={onOptimize}
-        disabled={optimizeDisabled}
+        onClick={onOptimise}
+        disabled={optimiseDisabled}
         className="mt-4 w-full border-2 border-nb-cyan font-mono text-[10px] tracking-widest
                    py-3 text-nb-cyan hover:bg-nb-cyan hover:text-nb-bg transition-all
                    disabled:border-nb-border disabled:text-nb-dim disabled:cursor-not-allowed nb-pop-btn"
-        whileTap={!optimizeDisabled ? { scale: 0.98 } : {}}
+        whileTap={!optimiseDisabled ? { scale: 0.98 } : {}}
       >
-        OPTIMIZE PORTFOLIO
+        OPTIMISE PORTFOLIO
       </motion.button>
     </StageShell>
   );
