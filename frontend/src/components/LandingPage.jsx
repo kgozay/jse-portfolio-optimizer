@@ -25,15 +25,14 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }
 });
 
-export function LandingPage({ onLaunch, rfData }) {
+export function LandingPage({ onLaunch }) {
   const scrambledTagline = useTextScramble('MODERN PORTFOLIO THEORY · JSE EQUITIES', 800);
   const scrambledTitle = useTextScramble('JSE PORTFOLIO OPTIMISER', 1200);
 
   // Mouse position state for tracking cursor spotlight
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   
-  // Latency state
-  const [latency, setLatency] = useState(24);
+
 
   // Tickers for scrolling marquee
   const [tickersData, setTickersData] = useState([
@@ -56,16 +55,7 @@ export function LandingPage({ onLaunch, rfData }) {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  useEffect(() => {
-    const latInterval = setInterval(() => {
-      setLatency(prev => {
-        const diff = Math.floor(Math.random() * 5 - 2); // -2 to +2
-        const next = prev + diff;
-        return Math.max(12, Math.min(48, next));
-      });
-    }, 2000);
-    return () => clearInterval(latInterval);
-  }, []);
+
 
   useEffect(() => {
     const tickInterval = setInterval(() => {
@@ -165,43 +155,7 @@ export function LandingPage({ onLaunch, rfData }) {
             </p>
           </motion.div>
 
-          {/* Telemetry Stats Grid */}
-          <motion.div 
-            {...fadeUp(0.15)} 
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 bg-nb-surface/40 backdrop-blur-md border border-nb-border/60 p-4 rounded-[4px]"
-          >
-            <div className="flex flex-col">
-              <span className="font-mono text-[9px] text-nb-muted tracking-wider uppercase font-bold">JSE BENCHMARK RATE</span>
-              <span className="font-mono text-sm md:text-base text-nb-emerald font-bold mt-1">
-                {rfData?.rate_pct ? `${rfData.rate_pct.toFixed(2)}%` : '10.50%'}
-              </span>
-              <span className="font-mono text-[8px] text-nb-dim mt-0.5 uppercase">SOURCE: FRED (SA 10Y)</span>
-            </div>
-            
-            <div className="flex flex-col">
-              <span className="font-mono text-[9px] text-nb-muted tracking-wider uppercase font-bold">API LATENCY</span>
-              <span className="font-mono text-sm md:text-base text-nb-cyan font-bold mt-1">
-                {latency} ms
-              </span>
-              <span className="font-mono text-[8px] text-nb-dim mt-0.5 uppercase">ROUTE: /OPTIMISE/STREAM</span>
-            </div>
 
-            <div className="flex flex-col">
-              <span className="font-mono text-[9px] text-nb-muted tracking-wider uppercase font-bold">CACHE EXPOSURE</span>
-              <span className="font-mono text-sm md:text-base text-nb-amber font-bold mt-1 font-bold">
-                ACTIVE (HIT)
-              </span>
-              <span className="font-mono text-[8px] text-nb-dim mt-0.5 uppercase">TTL: 21,600 SECONDS</span>
-            </div>
-
-            <div className="flex flex-col">
-              <span className="font-mono text-[9px] text-nb-muted tracking-wider uppercase font-bold">SYS MEMORY LOAD</span>
-              <span className="font-mono text-sm md:text-base text-nb-text font-bold mt-1">
-                42.8 MB
-              </span>
-              <span className="font-mono text-[8px] text-nb-dim mt-0.5 uppercase">ALLOCATION: OPTIMAL</span>
-            </div>
-          </motion.div>
 
           {/* Interactive Feature Cards */}
           <motion.div {...fadeUp(0.2)} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">

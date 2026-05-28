@@ -103,7 +103,7 @@ export default function App() {
           transition={{ duration: 0.3 }}
           className="w-full animate-fade"
         >
-          <LandingPage onLaunch={() => setShowApp(true)} rfData={rfData} />
+          <LandingPage onLaunch={() => setShowApp(true)} />
         </motion.div>
       ) : (
         <motion.div
