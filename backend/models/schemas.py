@@ -16,14 +16,6 @@ class OptimiseRequest(BaseModel):
     def clean_tickers(cls, v):
         return list(dict.fromkeys([t.upper().strip() for t in v]))
 
-    @field_validator("max_weight")
-    @classmethod
-    def weight_must_be_feasible(cls, v, info):
-        n = len(info.data.get("tickers", []))
-        if n > 0 and v < 1.0 / n:
-            raise ValueError(f"max_weight {v:.2f} is too low for {n} assets (min = {1/n:.2f}).")
-        return v
-
 
 class WeightItem(BaseModel):
     ticker: str
