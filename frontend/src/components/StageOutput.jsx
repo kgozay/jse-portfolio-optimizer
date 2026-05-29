@@ -282,9 +282,9 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
       <StageShell number="03" label="OUTPUT" id="stage-output" isActive={isActive}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            {/* View Switcher Tabs */}
-            <div className="mb-1">
-              <div className="flex border border-nb-border font-mono text-[9px] tracking-wider bg-nb-bg">
+            {/* View Switcher Tabs & Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div className="flex-1 flex border border-nb-border font-mono text-[9px] tracking-wider bg-nb-bg">
                 {[
                   { key: 'frontier', label: 'FRONTIER' },
                   { key: 'correlation', label: 'CORRELATION' },
@@ -294,7 +294,9 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
                   <button
                     key={key}
                     onClick={() => setActiveTab(key)}
-                    className={`flex-1 py-3 text-center transition-colors ${i < arr.length - 1 ? 'border-r border-nb-border' : ''} ${
+                    className={`flex-grow flex-shrink flex-1 py-3 text-center min-w-0 overflow-hidden text-ellipsis whitespace-nowrap transition-colors ${
+                      i < arr.length - 1 ? 'border-r border-nb-border' : ''
+                    } ${
                       activeTab === key
                         ? 'text-nb-cyan font-bold border-b-2 border-b-nb-cyan bg-nb-surface/60'
                         : 'text-nb-muted hover:text-nb-text'
@@ -304,23 +306,21 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
                   </button>
                 ))}
               </div>
-              {/* Save Run button — sits flush below the tab bar */}
-              <div className="flex justify-end mt-2 mb-4">
-                <button
-                  onClick={handleSaveRun}
-                  className={`font-mono text-[9px] tracking-widest px-3 py-1.5 border transition-all nb-pop-btn bg-nb-bg ${
-                    savedRuns.length === 1
-                      ? 'border-nb-amber text-nb-amber'
-                      : savedRuns.length === 2
-                      ? 'border-nb-muted text-nb-muted hover:text-nb-text'
-                      : 'border-nb-border text-nb-muted hover:text-nb-text'
-                  }`}
-                >
-                  {savedRuns.length === 0 && 'SAVE RUN'}
-                  {savedRuns.length === 1 && '+ SAVE & COMPARE'}
-                  {savedRuns.length === 2 && `REPLACE ${savedRuns[0].label}`}
-                </button>
-              </div>
+              
+              <button
+                onClick={handleSaveRun}
+                className={`font-mono text-[9px] tracking-widest px-3 py-1.5 border transition-all nb-pop-btn bg-nb-bg shrink-0 ${
+                  savedRuns.length === 1
+                    ? 'border-nb-amber text-nb-amber'
+                    : savedRuns.length === 2
+                    ? 'border-nb-muted text-nb-muted hover:text-nb-text'
+                    : 'border-nb-border text-nb-muted hover:text-nb-text'
+                }`}
+              >
+                {savedRuns.length === 0 && 'SAVE RUN'}
+                {savedRuns.length === 1 && '+ SAVE & COMPARE'}
+                {savedRuns.length === 2 && `REPLACE ${savedRuns[0].label}`}
+              </button>
             </div>
 
             {activeTab === 'frontier' && (
@@ -407,7 +407,7 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
             {/* Advanced Risk Metrics Panel */}
             <div className="border border-nb-border p-4 bg-nb-surface/10 space-y-4">
               <div className="font-mono text-[10px] tracking-widest text-nb-muted uppercase font-bold">RISK METRICS</div>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                 <div className="space-y-1">
                   <div className="font-mono text-[9px] text-nb-dim uppercase tracking-wide">Daily Loss Threshold</div>
                   <div className="font-mono text-base text-nb-text font-bold">

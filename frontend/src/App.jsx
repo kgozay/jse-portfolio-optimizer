@@ -8,6 +8,7 @@ import { ColdStartBanner } from './components/ColdStartBanner';
 import { LandingPage } from './components/LandingPage';
 import { useOptimiser } from './hooks/useOptimiser';
 import { useRfRate } from './hooks/useRfRate';
+import { useTextScramble } from './hooks/useTextScramble';
 import { API_URL, DEFAULT_MAX_WEIGHT, DEFAULT_PERIOD, DEFAULT_ESTIMATOR, DEFAULT_N_SIMS } from './lib/constants';
 
 export default function App() {
@@ -16,6 +17,8 @@ export default function App() {
   const [showApp, setShowApp] = useState(false);
   const { rfData } = useRfRate();
   const { optimise, logs, result, status } = useOptimiser();
+  
+  const scrambledTitle = useTextScramble('JSE PORTFOLIO OPTIMISER', 1000);
 
   const validCount = tickers.filter(t => t.status === 'valid').length;
 
@@ -114,9 +117,9 @@ export default function App() {
           className="w-full flex justify-center"
         >
           <div className="min-h-screen bg-nb-bg text-nb-text p-4 md:p-8 flex justify-center pb-24 w-full">
-            <div className="w-full max-w-2xl">
+            <div className="w-full max-w-2xl lg:max-w-5xl transition-all duration-300">
               <header className="mb-8 pb-5 border-b border-nb-border">
-                <h1 className="font-mono text-2xl tracking-wide text-nb-text font-bold">JSE PORTFOLIO OPTIMISER</h1>
+                <h1 className="font-mono text-2xl tracking-wide text-nb-text font-bold">{scrambledTitle}</h1>
                 <p className="font-mono text-[11px] text-nb-cyan mt-2 tracking-widest">
                   {objective === 'max_sortino'
                     ? 'MAXIMUM SORTINO RATIO · MEAN-SEMIVARIANCE MODELLING'

@@ -90,4 +90,24 @@
   .cursor { animation: none; opacity: 1; }
 }
 
+/* Sleek, hardware-accelerated text shimmer animation */
+@keyframes shiny-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.nb-shiny-text {
+  background: linear-gradient(
+    120deg, 
+    #A0A0A5 35%, 
+    #00D4FF 50%, 
+    #A0A0A5 65%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+  animation: shiny-shimmer 4s infinite linear;
+}
+
 

@@ -86,7 +86,7 @@ export function LandingPage({ onLaunch }) {
     >
       {/* Dynamic Cursor Spotlight Mesh */}
       <div 
-        className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-300"
+        className="fixed inset-0 pointer-events-none z-0 transition-opacity duration-300"
         style={{
           background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(0, 212, 255, 0.06), transparent 80%)`,
         }}
@@ -145,8 +145,8 @@ export function LandingPage({ onLaunch }) {
             <p className="font-mono text-xs md:text-sm tracking-[0.3em] text-nb-cyan mb-4 font-bold">
               {scrambledTagline}
             </p>
-            <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-nb-text leading-[1.05] mb-6">
-              {scrambledTitle}
+            <h1 className="font-mono text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.05] mb-6">
+              <span className="nb-shiny-text">{scrambledTitle}</span>
             </h1>
             <p className="font-mono text-sm sm:text-base text-nb-muted leading-relaxed max-w-2xl">
               Construct, backtest, and analyse optimal asset weight allocations using mean-variance 
@@ -191,6 +191,14 @@ export function LandingPage({ onLaunch }) {
                            hover:-translate-y-1 hover:-translate-x-1 ${hoverShadow}
                            group flex flex-col justify-between min-h-[160px] relative overflow-hidden`}
               >
+                {/* Subtle Blueprint Dot Grid Background */}
+                <div 
+                  className="absolute inset-0 opacity-[0.02] pointer-events-none" 
+                  style={{
+                    backgroundImage: 'radial-gradient(#E0E0E2 1px, transparent 1px)',
+                    backgroundSize: '16px 16px'
+                  }} 
+                />
                 <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: accent }} />
                 <div className="pl-3">
                   <p className={`font-mono text-xs ${numColor} font-bold tracking-widest mb-3`}>

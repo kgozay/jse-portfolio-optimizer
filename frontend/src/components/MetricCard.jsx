@@ -27,7 +27,7 @@ export function MetricCard({ label, value, suffix = '%', runId, isWarning = fals
       <div className={`absolute bottom-[-2px] left-[-2px] w-2 h-2 border-b-2 border-l-2 ${bracketColor}`} />
       <div className={`absolute bottom-[-2px] right-[-2px] w-2 h-2 border-b-2 border-r-2 ${bracketColor}`} />
 
-      <div className="font-mono text-[9px] tracking-wide text-nb-muted uppercase leading-none">{scrambledLabel}</div>
+      <div className="font-mono text-[9px] tracking-wide text-nb-muted uppercase leading-tight">{scrambledLabel}</div>
       <div className={`font-mono text-2xl font-bold mt-2 ${color}`}>
         {scrambledValue}
       </div>
