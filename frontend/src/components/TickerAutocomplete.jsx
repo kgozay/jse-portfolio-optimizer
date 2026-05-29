@@ -69,8 +69,8 @@ export function TickerAutocomplete({ value, onChange, onSelect, disabled }) {
         onBlur={() => setTimeout(() => { setFocused(false); setActiveIndex(-1); }, 150)}
         disabled={disabled}
         placeholder="TICKER OR COMPANY NAME"
-        className="w-full bg-transparent border border-nb-border font-mono text-[10px]
-                   tracking-widest px-3 py-2 text-nb-text placeholder:text-nb-dim
+        className="w-full bg-transparent border border-nb-border font-mono text-xs
+                   tracking-widest px-3 py-2.5 text-nb-text placeholder:text-nb-dim
                    focus:border-nb-cyan outline-none disabled:opacity-30"
       />
       {focused && suggestions.length > 0 && (
@@ -83,14 +83,14 @@ export function TickerAutocomplete({ value, onChange, onSelect, disabled }) {
               <button
                 key={s.ticker}
                 onMouseDown={() => { onSelect(s.ticker, s.name); setSuggestions([]); }}
-                className={`w-full flex items-center justify-between text-left px-3 py-2 font-mono text-[10px] transition-colors ${
+                className={`w-full flex items-center justify-between text-left px-3 py-2 font-mono text-xs transition-colors ${
                   isActive ? 'bg-nb-border text-nb-cyan font-bold' : 'text-nb-muted hover:bg-nb-border hover:text-nb-text'
                 }`}
               >
                 <span className="truncate">
-                  {s.ticker} <span className="text-[9px] opacity-60">— {s.name}</span>
+                  {s.ticker} <span className="text-[10px] opacity-60">— {s.name}</span>
                 </span>
-                <span className={`ml-2 text-[7px] border px-1.5 py-[1px] tracking-wider shrink-0 transition-colors ${
+                <span className={`ml-2 text-[9px] border px-1.5 py-[1px] tracking-wider shrink-0 transition-colors ${
                   isActive ? 'border-nb-cyan text-nb-cyan' : 'border-nb-border text-nb-dim'
                 }`}>
                   {sectorLabel}

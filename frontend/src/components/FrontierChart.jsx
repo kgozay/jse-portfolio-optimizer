@@ -155,7 +155,7 @@ export function FrontierChart({ result, customPoint, onFrontierClick }) {
       </ResponsiveContainer>
 
       {/* Visual Legend */}
-      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-[8px] font-mono text-nb-muted uppercase tracking-wider">
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-[10px] font-mono text-nb-muted uppercase tracking-wider">
         <div className="flex items-center gap-1.5">
           <span className="inline-block w-2.5 h-2.5 bg-[rgba(0,190,220,0.25)] rounded-sm"></span>
           <span>Simulations</span>

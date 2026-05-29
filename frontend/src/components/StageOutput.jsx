@@ -146,31 +146,24 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             {/* View Switcher Tabs */}
-            <div className="flex border border-nb-border mb-4 font-mono text-[9px] tracking-widest bg-nb-bg">
-              <button 
-                onClick={() => setActiveTab('frontier')}
-                className={`flex-1 py-2 text-center transition-colors border-r border-nb-border ${
-                  activeTab === 'frontier' ? 'bg-nb-surface text-nb-cyan font-bold' : 'text-nb-muted hover:text-nb-text'
-                }`}
-              >
-                FRONTIER
-              </button>
-              <button 
-                onClick={() => setActiveTab('correlation')}
-                className={`flex-1 py-2 text-center transition-colors border-r border-nb-border ${
-                  activeTab === 'correlation' ? 'bg-nb-surface text-nb-cyan font-bold' : 'text-nb-muted hover:text-nb-text'
-                }`}
-              >
-                CORRELATION
-              </button>
-              <button 
-                onClick={() => setActiveTab('backtest')}
-                className={`flex-1 py-2 text-center transition-colors ${
-                  activeTab === 'backtest' ? 'bg-nb-surface text-nb-cyan font-bold' : 'text-nb-muted hover:text-nb-text'
-                }`}
-              >
-                BACKTEST
-              </button>
+            <div className="flex border border-nb-border mb-4 font-mono text-[10px] tracking-widest bg-nb-bg">
+              {[
+                { key: 'frontier', label: 'FRONTIER' },
+                { key: 'correlation', label: 'CORRELATION' },
+                { key: 'backtest', label: 'BACKTEST' },
+              ].map(({ key, label }, i, arr) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  className={`flex-1 py-2.5 text-center transition-colors ${i < arr.length - 1 ? 'border-r border-nb-border' : ''} ${
+                    activeTab === key
+                      ? 'text-nb-cyan font-bold border-b-2 border-b-nb-cyan bg-nb-surface/60'
+                      : 'text-nb-muted hover:text-nb-text'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
 
             {activeTab === 'frontier' && (
@@ -190,7 +183,7 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
               <div className="min-h-[340px] space-y-4 animate-fade">
                 {/* Benchmark Selection Bar */}
                 <div className="flex justify-between items-center border border-nb-border px-3 py-2 bg-nb-surface/40">
-                  <span className="font-mono text-[8px] tracking-widest text-nb-muted uppercase">SELECT BENCHMARK</span>
+                  <span className="font-mono text-[10px] tracking-widest text-nb-muted uppercase font-bold">SELECT BENCHMARK</span>
                   <select
                     value={benchmark}
                     onChange={(e) => setBenchmark(e.target.value)}
@@ -240,37 +233,37 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
             </div>
 
             {/* Advanced Risk Metrics Panel */}
-            <div className="border border-nb-border p-3 bg-nb-surface/10 space-y-2">
-              <div className="font-mono text-[8px] tracking-widest text-nb-dim uppercase">ADVANCED RISK METRICS (HISTORICAL)</div>
-              <div className="grid grid-cols-3 gap-2">
+            <div className="border border-nb-border p-4 bg-nb-surface/10 space-y-3">
+              <div className="font-mono text-[10px] tracking-widest text-nb-muted uppercase font-bold">ADVANCED RISK METRICS</div>
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <div className="font-mono text-[7px] text-nb-muted uppercase">95% Daily VaR</div>
-                  <div className="font-mono text-xs mt-0.5 text-nb-text font-bold font-mono">
+                  <div className="font-mono text-[10px] text-nb-dim uppercase tracking-wide">95% Daily VaR</div>
+                  <div className="font-mono text-sm mt-1 text-nb-text font-bold">
                     {result.var_value !== undefined ? `${(result.var_value * 100).toFixed(3)}%` : 'N/A'}
                   </div>
                 </div>
                 <div>
-                  <div className="font-mono text-[7px] text-nb-muted uppercase">95% Daily CVaR</div>
-                  <div className="font-mono text-xs mt-0.5 text-nb-text font-bold font-mono">
+                  <div className="font-mono text-[10px] text-nb-dim uppercase tracking-wide">95% Daily CVaR</div>
+                  <div className="font-mono text-sm mt-1 text-nb-text font-bold">
                     {result.cvar_value !== undefined ? `${(result.cvar_value * 100).toFixed(3)}%` : 'N/A'}
                   </div>
                 </div>
                 <div>
-                  <div className="font-mono text-[7px] text-nb-muted uppercase">Portfolio Beta</div>
-                  <div className="font-mono text-xs mt-0.5 text-nb-cyan font-bold font-mono">
+                  <div className="font-mono text-[10px] text-nb-dim uppercase tracking-wide">Portfolio Beta</div>
+                  <div className="font-mono text-sm mt-1 text-nb-cyan font-bold">
                     {backtestResult?.beta !== undefined ? backtestResult.beta.toFixed(2) : 'N/A'}
                   </div>
                 </div>
               </div>
-              <p className="font-mono text-[7px] text-nb-dim leading-relaxed">
-                Value at Risk (VaR) represents the minimum expected loss over a 1-day horizon at 95% confidence. CVaR (Expected Shortfall) represents the average losses in the worst 5% of trading days. Beta measures market sensitivity relative to the chosen benchmark.
+              <p className="font-mono text-[9px] text-nb-dim leading-relaxed border-t border-nb-border pt-2">
+                VaR: minimum expected loss over 1 day at 95% confidence. CVaR (Expected Shortfall): average loss in the worst 5% of days. Beta: market sensitivity vs. chosen benchmark.
               </p>
             </div>
 
             {/* Adjust Weights Toggle Widget */}
             {result.asset_returns && result.covariance && (
-              <div className="flex justify-between items-center border border-nb-border px-3 py-2 bg-nb-surface/40">
-                <span className="font-mono text-[8px] tracking-widest text-nb-muted">SIMULATE MANUAL WEIGHTS</span>
+              <div className="flex justify-between items-center border border-nb-border px-3 py-2.5 bg-nb-surface/40">
+                <span className="font-mono text-[10px] tracking-widest text-nb-muted font-bold">SIMULATE MANUAL WEIGHTS</span>
                 <button
                   onClick={() => {
                     if (isAdjusting) {
@@ -282,9 +275,9 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
                     }
                     setIsAdjusting(!isAdjusting);
                   }}
-                  className={`font-mono text-[9px] px-2 py-1 border transition-all nb-pop-btn bg-nb-bg ${
-                    isAdjusting 
-                      ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/10 font-bold shadow-[2px_2px_0px_0px_#00D4FF] -translate-x-0.5 -translate-y-0.5' 
+                  className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn bg-nb-bg ${
+                    isAdjusting
+                      ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/10 font-bold shadow-[2px_2px_0px_0px_#00D4FF] -translate-x-0.5 -translate-y-0.5'
                       : 'border-nb-border text-nb-muted hover:border-nb-border-bright hover:text-nb-text'
                   }`}
                 >
@@ -307,13 +300,13 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
             </div>
 
             {result.tickers_dropped?.length > 0 && (
-              <div className="border border-nb-amber p-2.5 mt-2">
-                <p className="font-mono text-[8px] text-nb-amber tracking-widest mb-1">
-                  ⚠ WARNING — TICKERS DROPPED
+              <div className="border border-nb-amber p-3 mt-2">
+                <p className="font-mono text-[10px] text-nb-amber tracking-widest mb-1.5 font-bold">
+                  ⚠ TICKERS DROPPED
                 </p>
-                <p className="font-mono text-[8px] text-nb-amber/70 leading-relaxed">
+                <p className="font-mono text-[10px] text-nb-amber/70 leading-relaxed">
                   {result.tickers_dropped.join(', ')} — insufficient price history
-                  (&lt; 252 trading days). Optimisation ran on remaining {result.weights
+                  (&lt;252 trading days). Optimisation ran on remaining {result.weights
                     ? result.weights.length
                     : 'available'} tickers.
                 </p>

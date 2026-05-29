@@ -40,7 +40,7 @@ export function StageInput({ tickers, setTickers, onOptimise, optimiseDisabled, 
         <button
           onClick={() => setTickers([])}
           disabled={tickers.length === 0}
-          className="border border-nb-border font-mono text-[9px] tracking-widest px-3
+          className="border border-nb-border font-mono text-[10px] tracking-widest px-3
                      text-nb-dim hover:border-nb-border-bright hover:text-nb-muted
                      disabled:opacity-30 disabled:cursor-not-allowed nb-pop-btn"
         >
@@ -49,8 +49,8 @@ export function StageInput({ tickers, setTickers, onOptimise, optimiseDisabled, 
       </div>
 
       {/* Preset Quick-Load Templates */}
-      <div className="flex flex-wrap items-center gap-1.5 mb-4 text-[9px] font-mono text-nb-muted">
-        <span className="text-[8px] tracking-widest text-nb-dim uppercase mr-1">PRESETS:</span>
+      <div className="flex flex-wrap items-center gap-1.5 mb-4 text-[10px] font-mono text-nb-muted">
+        <span className="text-[10px] tracking-widest text-nb-dim uppercase mr-1">PRESETS:</span>
         {[
           { label: 'BLUE CHIPS', tickers: ['NPN', 'SBK', 'SHP', 'MTN', 'BHP'] },
           { label: 'RESOURCES', tickers: ['BHP', 'AGL', 'SOL', 'GFI', 'HAR'] },
@@ -98,20 +98,20 @@ export function StageInput({ tickers, setTickers, onOptimise, optimiseDisabled, 
       </AnimatePresence>
 
       {tickers.length > 0 && tickers.length < MIN_TICKERS && (
-        <p className="font-mono text-[9px] text-nb-amber mt-2">
+        <p className="font-mono text-[10px] text-nb-amber mt-2">
           Add {MIN_TICKERS - tickers.length} more ticker{MIN_TICKERS - tickers.length > 1 ? 's' : ''} to enable optimisation
         </p>
       )}
       {tickers.length >= MAX_TICKERS && (
-        <p className="font-mono text-[9px] text-nb-dim mt-2">Maximum {MAX_TICKERS} tickers reached</p>
+        <p className="font-mono text-[10px] text-nb-dim mt-2">Maximum {MAX_TICKERS} tickers reached</p>
       )}
 
       <motion.button
         onClick={onOptimise}
         disabled={optimiseDisabled}
-        className="mt-4 w-full border-2 border-nb-cyan font-mono text-[10px] tracking-widest
-                   py-3 text-nb-cyan hover:bg-nb-cyan hover:text-nb-bg transition-all
-                   disabled:border-nb-border disabled:text-nb-dim disabled:cursor-not-allowed nb-pop-btn"
+        className="mt-4 w-full border-2 border-nb-cyan font-mono text-xs tracking-widest
+                   py-3.5 text-nb-cyan hover:bg-nb-cyan hover:text-nb-bg transition-all
+                   disabled:border-nb-border disabled:text-nb-dim disabled:cursor-not-allowed nb-pop-btn font-bold"
         whileTap={!optimiseDisabled ? { scale: 0.98 } : {}}
       >
         OPTIMISE PORTFOLIO

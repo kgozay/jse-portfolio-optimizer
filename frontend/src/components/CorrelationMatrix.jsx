@@ -47,11 +47,11 @@ export function CorrelationMatrix({ result }) {
           {/* Header Row */}
           <div className="flex">
             {/* Blank corner cell */}
-            <div className="w-10 h-8 flex items-center justify-center font-mono text-[7px] text-nb-dim uppercase tracking-wider shrink-0" />
+            <div className="w-10 h-8 flex items-center justify-center font-mono text-[9px] text-nb-dim uppercase tracking-wider shrink-0" />
             {tickers.map(t => (
-              <div 
-                key={`col-${t}`} 
-                className="w-10 h-8 flex items-center justify-center font-mono text-[8px] text-nb-muted font-bold shrink-0 border-b border-nb-border"
+              <div
+                key={`col-${t}`}
+                className="w-10 h-8 flex items-center justify-center font-mono text-[9px] text-nb-muted font-bold shrink-0 border-b border-nb-border"
               >
                 {t}
               </div>
@@ -62,7 +62,7 @@ export function CorrelationMatrix({ result }) {
           {tickers.map(t1 => (
             <div key={`row-${t1}`} className="flex">
               {/* Row Label */}
-              <div className="w-10 h-10 flex items-center justify-end pr-2 font-mono text-[8px] text-nb-muted font-bold shrink-0 border-r border-nb-border">
+              <div className="w-10 h-10 flex items-center justify-end pr-2 font-mono text-[9px] text-nb-muted font-bold shrink-0 border-r border-nb-border">
                 {t1}
               </div>
               

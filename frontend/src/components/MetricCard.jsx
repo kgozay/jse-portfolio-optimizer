@@ -26,8 +26,8 @@ export function MetricCard({ label, value, suffix = '%', runId, isWarning = fals
       <div className={`absolute bottom-[-2px] left-[-2px] w-1.5 h-1.5 border-b-2 border-l-2 ${bracketColor}`} />
       <div className={`absolute bottom-[-2px] right-[-2px] w-1.5 h-1.5 border-b-2 border-r-2 ${bracketColor}`} />
 
-      <div className="font-mono text-[8px] tracking-widest text-nb-dim uppercase">{scrambledLabel}</div>
-      <div className={`font-mono text-base md:text-lg mt-1 font-bold ${color}`}>
+      <div className="font-mono text-[10px] tracking-widest text-nb-muted uppercase leading-tight">{scrambledLabel}</div>
+      <div className={`font-mono text-lg md:text-xl mt-1.5 font-bold ${color}`}>
         {scrambledValue}
       </div>
     </motion.div>

@@ -17,7 +17,7 @@ export function SectorBreakdown({ sectors }) {
 
   return (
     <div className="mt-4 border border-nb-border p-3 bg-nb-surface/20">
-      <div className="font-mono text-[8px] tracking-widest text-nb-dim mb-3">SECTOR EXPOSURE</div>
+      <div className="font-mono text-[10px] tracking-widest text-nb-muted mb-3 font-bold">SECTOR EXPOSURE</div>
       
       {/* Thicker, Segmented Progress Bar */}
       <div className="flex h-3 w-full bg-nb-surface overflow-hidden border border-nb-border mb-3">
@@ -60,8 +60,8 @@ export function SectorBreakdown({ sectors }) {
                 className="w-[6px] h-[6px] shrink-0 border border-nb-bg" 
                 style={{ backgroundColor: color }}
               />
-              <span className="font-mono text-[8px] uppercase tracking-wide">
-                {s.sector} <span className="text-nb-text font-mono">{(s.weight * 100).toFixed(0)}%</span>
+              <span className="font-mono text-[10px] uppercase tracking-wide">
+                {s.sector} <span className="text-nb-text font-mono font-bold">{(s.weight * 100).toFixed(0)}%</span>
               </span>
             </div>
           );

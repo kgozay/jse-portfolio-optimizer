@@ -45,19 +45,19 @@ export function BacktestChart({ backtestResult }) {
       {/* Backtest mini dashboard */}
       <div className="grid grid-cols-3 gap-2">
         <div className="border border-nb-border p-2 bg-nb-surface/10">
-          <div className="font-mono text-[7px] tracking-widest text-nb-dim">BACKTEST PORTFOLIO</div>
+          <div className="font-mono text-[10px] tracking-widest text-nb-dim">BACKTEST PORTFOLIO</div>
           <div className="font-mono text-xs mt-1 text-nb-emerald font-bold">
             {total_return_pct >= 0 ? '+' : ''}{total_return_pct.toFixed(2)}%
           </div>
         </div>
         <div className="border border-nb-border p-2 bg-nb-surface/10">
-          <div className="font-mono text-[7px] tracking-widest text-nb-dim">BENCHMARK INDEX</div>
+          <div className="font-mono text-[10px] tracking-widest text-nb-dim">BENCHMARK INDEX</div>
           <div className="font-mono text-xs mt-1 text-nb-muted font-bold">
             {benchmark_return_pct >= 0 ? '+' : ''}{benchmark_return_pct.toFixed(2)}%
           </div>
         </div>
         <div className="border border-nb-border p-2 bg-nb-surface/10">
-          <div className="font-mono text-[7px] tracking-widest text-nb-dim">ALPHA OUTPERF.</div>
+          <div className="font-mono text-[10px] tracking-widest text-nb-dim">ALPHA OUTPERF.</div>
           <div className={`font-mono text-xs mt-1 font-bold ${isAlphaPositive ? 'text-nb-cyan' : 'text-nb-red'}`}>
             {isAlphaPositive ? '+' : ''}{alpha_pct.toFixed(2)}%
           </div>
@@ -67,19 +67,19 @@ export function BacktestChart({ backtestResult }) {
       {/* Advanced Risk Metrics Row */}
       <div className="grid grid-cols-3 gap-2">
         <div className="border border-nb-border p-2 bg-nb-surface/10">
-          <div className="font-mono text-[7px] tracking-widest text-nb-dim">MAX DRAWDOWN</div>
+          <div className="font-mono text-[10px] tracking-widest text-nb-dim">MAX DRAWDOWN</div>
           <div className="font-mono text-xs mt-1 text-nb-red font-bold">
             {max_drawdown_pct?.toFixed(2)}%
           </div>
         </div>
         <div className="border border-nb-border p-2 bg-nb-surface/10">
-          <div className="font-mono text-[7px] tracking-widest text-nb-dim">PORTFOLIO BETA</div>
+          <div className="font-mono text-[10px] tracking-widest text-nb-dim">PORTFOLIO BETA</div>
           <div className="font-mono text-xs mt-1 text-nb-cyan font-bold">
             {beta?.toFixed(2)}
           </div>
         </div>
         <div className="border border-nb-border p-2 bg-nb-surface/10">
-          <div className="font-mono text-[7px] tracking-widest text-nb-dim">SORTINO RATIO</div>
+          <div className="font-mono text-[10px] tracking-widest text-nb-dim">SORTINO RATIO</div>
           <div className="font-mono text-xs mt-1 text-nb-emerald font-bold">
             {sortino_ratio?.toFixed(2)}
           </div>
@@ -140,7 +140,7 @@ export function BacktestChart({ backtestResult }) {
           </AreaChart>
         </ResponsiveContainer>
 
-        <div className="flex justify-center gap-6 text-[8px] font-mono text-nb-muted mt-2 uppercase tracking-wider">
+        <div className="flex justify-center gap-6 text-[10px] font-mono text-nb-muted mt-2 uppercase tracking-wider">
           <div className="flex items-center gap-1.5">
             <span className="inline-block w-2.5 h-0.5 bg-[#00C853]"></span>
             <span>Optimised Portfolio Equity Curve</span>

@@ -8,7 +8,7 @@ export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onCh
       transition={{ delay, duration: 0.25 }}
       className="flex items-center gap-2 py-1"
     >
-      <span className="font-mono text-[10px] text-nb-muted w-8 shrink-0">{ticker}</span>
+      <span className="font-mono text-[11px] text-nb-muted w-9 shrink-0 font-bold">{ticker}</span>
       {isAdjusting ? (
         <input
           type="range"
@@ -17,13 +17,13 @@ export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onCh
           step="1"
           value={Math.round(weight * 100)}
           onChange={(e) => onChange(ticker, parseInt(e.target.value) / 100)}
-          className="flex-1 accent-nb-cyan h-[6px] bg-nb-surface appearance-none outline-none border border-nb-border cursor-ew-resize rounded-none"
+          className="flex-1 accent-nb-cyan h-2 bg-nb-surface appearance-none outline-none border border-nb-border cursor-ew-resize rounded-none"
           style={{
-            background: `linear-gradient(to right, #00D4FF 0%, #00D4FF ${weight * 100}%, #141415 ${weight * 100}%, #141415 100%)`
+            background: `linear-gradient(to right, #00D4FF 0%, #00D4FF ${weight * 100}%, #1C1C1E ${weight * 100}%, #1C1C1E 100%)`
           }}
         />
       ) : (
-        <div className="flex-1 bg-nb-surface h-[2px]">
+        <div className="flex-1 bg-nb-surface h-[4px]">
           <motion.div
             className="bg-nb-emerald h-full"
             initial={{ width: '0%' }}
@@ -32,7 +32,7 @@ export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onCh
           />
         </div>
       )}
-      <span className="font-mono text-[10px] text-nb-text w-12 text-right">
+      <span className="font-mono text-[11px] text-nb-text w-12 text-right font-bold">
         {(weight * 100).toFixed(1)}%
       </span>
     </motion.div>

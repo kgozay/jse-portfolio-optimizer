@@ -81,4 +81,13 @@
   animation-play-state: paused;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .scan-line { display: none; }
+  .active-glow { animation: none; border-color: #00D4FF !important; }
+  .animate-marquee { animation: none; }
+  .nb-pop-btn { transition: none; }
+  .nb-pop-card { transition: none; }
+  .cursor { animation: none; opacity: 1; }
+}
+
 

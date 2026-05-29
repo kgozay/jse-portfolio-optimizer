@@ -48,7 +48,7 @@ export function ColdStartBanner() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
-          className="border border-nb-amber font-mono text-[9px] text-amber-500 tracking-wide px-3 py-2 mt-3"
+          className="border border-nb-amber font-mono text-[10px] text-amber-500 tracking-wide px-3 py-2.5 mt-3"
         >
           BACKEND WARMING UP — first optimization may take 30–60s
         </motion.div>

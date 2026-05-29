@@ -14,15 +14,15 @@ export function StageShell({ number, label, children, id, isActive = false }) {
         isActive ? 'active-glow z-10' : ''
       }`}
     >
-      <div className="border-b border-nb-surface px-4 py-2 flex items-center justify-between">
-        <span className="font-mono text-[8px] tracking-[0.2em] text-nb-dim">
+      <div className="border-b border-nb-surface px-4 py-2.5 flex items-center justify-between">
+        <span className="font-mono text-[10px] tracking-[0.2em] text-nb-muted font-bold">
           {number} / {scrambledLabel}
         </span>
         {isActive && (
           <span className="w-1.5 h-1.5 rounded-full bg-nb-cyan animate-pulse shadow-[0_0_8px_#00D4FF]" />
         )}
       </div>
-      <div className="p-4">{children}</div>
+      <div className="p-5">{children}</div>
     </motion.section>
   );
 }

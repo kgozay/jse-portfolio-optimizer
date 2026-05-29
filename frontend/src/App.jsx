@@ -115,14 +115,14 @@ export default function App() {
         >
           <div className="min-h-screen bg-nb-bg text-nb-text p-4 md:p-8 flex justify-center pb-24 w-full">
             <div className="w-full max-w-2xl">
-              <header className="mb-8">
-                <h1 className="font-mono text-xl tracking-wide text-nb-text">JSE PORTFOLIO OPTIMISER</h1>
-                <p className="font-mono text-xs text-nb-muted mt-2">
-                  {objective === 'max_sortino' 
-                    ? 'MAXIMUM SORTINO RATIO · MEAN-SEMIVARIANCE MODELING' 
+              <header className="mb-8 pb-5 border-b border-nb-border">
+                <h1 className="font-mono text-2xl tracking-wide text-nb-text font-bold">JSE PORTFOLIO OPTIMISER</h1>
+                <p className="font-mono text-[11px] text-nb-cyan mt-2 tracking-widest">
+                  {objective === 'max_sortino'
+                    ? 'MAXIMUM SORTINO RATIO · MEAN-SEMIVARIANCE MODELLING'
                     : objective === 'min_volatility'
-                      ? 'MINIMUM VOLATILITY · EFFICIENT FRONTIER MODELING'
-                      : 'MAXIMUM SHARPE RATIO · MEAN-VARIANCE MODELING'}
+                      ? 'MINIMUM VOLATILITY · EFFICIENT FRONTIER MODELLING'
+                      : 'MAXIMUM SHARPE RATIO · MEAN-VARIANCE MODELLING'}
                 </p>
               </header>
 

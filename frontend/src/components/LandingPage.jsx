@@ -163,27 +163,37 @@ export function LandingPage({ onLaunch }) {
               {
                 num: '01',
                 title: 'FETCH MARKET DATA',
-                body: 'Pull 3 years of daily live JSE equity prices directly via Yahoo Finance. Automatically filter out assets with insufficient historical observations.'
+                body: 'Pull 3 years of daily live JSE equity prices directly via Yahoo Finance. Automatically filter out assets with insufficient historical observations.',
+                accent: '#00D4FF',
+                numColor: 'text-nb-cyan',
+                hoverShadow: 'hover:shadow-[4px_4px_0px_0px_#00D4FF] hover:border-nb-cyan',
               },
               {
                 num: '02',
                 title: 'OPTIMISE WEIGHTS',
-                body: 'Compute Efficient Frontiers using Max Sharpe, Min Volatility, or Max Sortino formulations, backed by Ledoit-Wolf shrinkage and Monte Carlo paths.'
+                body: 'Compute Efficient Frontiers using Max Sharpe, Min Volatility, or Max Sortino formulations, backed by Ledoit-Wolf shrinkage and Monte Carlo paths.',
+                accent: '#00C853',
+                numColor: 'text-nb-emerald',
+                hoverShadow: 'hover:shadow-[4px_4px_0px_0px_#00C853] hover:border-nb-emerald',
               },
               {
                 num: '03',
                 title: 'ANALYSE OUTCOMES',
-                body: 'Inspect correlation heatmaps, sector exposure breakdowns, and dynamic historical backtests against custom benchmarks. Export results to CSV or PDF.'
-              }
-            ].map(({ num, title, body }) => (
-              <div 
-                key={num} 
-                className="border border-nb-border bg-nb-surface/60 backdrop-blur-sm p-6 transition-all duration-200 cursor-default rounded-[4px]
-                           hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_#00D4FF] 
-                           hover:border-nb-cyan group flex flex-col justify-between min-h-[160px]"
+                body: 'Inspect correlation heatmaps, sector exposure breakdowns, and dynamic historical backtests against custom benchmarks. Export results to CSV or PDF.',
+                accent: '#FFB340',
+                numColor: 'text-nb-amber',
+                hoverShadow: 'hover:shadow-[4px_4px_0px_0px_#FFB340] hover:border-nb-amber',
+              },
+            ].map(({ num, title, body, accent, numColor, hoverShadow }) => (
+              <div
+                key={num}
+                className={`border border-nb-border bg-nb-surface/60 backdrop-blur-sm p-6 transition-all duration-200 cursor-default rounded-[4px]
+                           hover:-translate-y-1 hover:-translate-x-1 ${hoverShadow}
+                           group flex flex-col justify-between min-h-[160px] relative overflow-hidden`}
               >
-                <div>
-                  <p className="font-mono text-xs text-nb-cyan font-bold tracking-widest mb-3">
+                <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: accent }} />
+                <div className="pl-3">
+                  <p className={`font-mono text-xs ${numColor} font-bold tracking-widest mb-3`}>
                     {num} / <ScrambleOnHover text={title} duration={500} />
                   </p>
                   <p className="font-mono text-xs sm:text-[13px] text-nb-muted group-hover:text-nb-text transition-colors duration-200 leading-relaxed">

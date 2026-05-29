@@ -50,7 +50,7 @@ export function StageCompute({
       <div className={`relative ${locked ? 'opacity-40 pointer-events-none select-none' : ''}`}>
         {locked && (
           <div className="absolute inset-0 z-10 flex items-center justify-center">
-            <span className="font-mono text-[8px] tracking-widest text-nb-dim border border-nb-border px-3 py-1 bg-nb-bg">
+            <span className="font-mono text-[10px] tracking-widest text-nb-dim border border-nb-border px-3 py-1.5 bg-nb-bg">
               SELECT TICKERS FIRST
             </span>
           </div>
@@ -59,7 +59,7 @@ export function StageCompute({
 
           {/* Risk-free rate */}
           <div className="flex justify-between items-center">
-            <span className="font-mono text-[9px] tracking-widest text-nb-muted">RISK-FREE RATE</span>
+            <span className="font-mono text-[11px] tracking-widest text-nb-muted">RISK-FREE RATE</span>
             <div className="flex items-center gap-2">
               <input
                 type="number"
@@ -73,14 +73,14 @@ export function StageCompute({
               />
               <span className="font-mono text-xs text-nb-muted">%</span>
               {rfData?.source === 'FRED' && rfOverride === null && (
-                <span className="font-mono text-[8px] text-nb-cyan border border-nb-cyan px-1 py-px">FRED LIVE</span>
+                <span className="font-mono text-[10px] text-nb-cyan border border-nb-cyan px-1.5 py-px">FRED LIVE</span>
               )}
               {rfData?.source === 'fallback' && (
-                <span className="font-mono text-[8px] text-amber-500 border border-amber-500 px-1 py-px">FALLBACK</span>
+                <span className="font-mono text-[10px] text-amber-500 border border-amber-500 px-1.5 py-px">FALLBACK</span>
               )}
               {rfOverride !== null && (
                 <button onClick={() => setRfOverride(null)}
-                        className="font-mono text-[8px] text-nb-dim border border-nb-border px-1 py-px
+                        className="font-mono text-[10px] text-nb-dim border border-nb-border px-1.5 py-px
                                    hover:border-nb-border-bright hover:text-nb-muted nb-pop-btn bg-nb-bg">
                   RESET
                 </button>
@@ -88,16 +88,16 @@ export function StageCompute({
             </div>
           </div>
           {rfData?.source === 'FRED' && rfData?.date && rfData?.date !== 'fallback' && (
-            <p className="font-mono text-[8px] text-nb-dim text-right">
+            <p className="font-mono text-[10px] text-nb-dim text-right">
               IRLTLT01ZAM156N · as of {rfData.date}
             </p>
           )}
 
-          {/* Optimization Target Objective */}
+          {/* Optimisation Target Objective */}
           <div className="flex flex-col gap-1">
             <div className="flex justify-between items-center">
-              <span className="font-mono text-[9px] tracking-widest text-nb-muted flex items-center">
-                OPTIMIZATION TARGET
+              <span className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
+                OPTIMISATION TARGET
                 <Tooltip text="Max Sharpe: maximises return per unit of total risk. Min Volatility: minimises portfolio standard deviation. Max Sortino: maximises return per unit of downside risk only." />
               </span>
               <div className="flex gap-1.5">
@@ -107,7 +107,7 @@ export function StageCompute({
                   ['max_sortino', 'MAX SORTINO']
                 ].map(([val, label]) => (
                   <button key={val} onClick={() => setObjective(val)}
-                          className={`font-mono text-[9px] px-2 py-1 border transition-all nb-pop-btn ${
+                          className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
                             objective === val 
                               ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]' 
                               : 'border-nb-border text-nb-dim hover:text-nb-text bg-nb-bg'
@@ -117,7 +117,7 @@ export function StageCompute({
                 ))}
               </div>
             </div>
-            <p className="font-mono text-[8px] text-nb-dim text-right mt-1">
+            <p className="font-mono text-[10px] text-nb-dim text-right mt-1">
               {objective === 'max_sharpe' && 'maximise return-to-total-risk ratio'}
               {objective === 'min_volatility' && 'minimise portfolio standard deviation'}
               {objective === 'max_sortino' && 'maximise return-to-downside-risk ratio'}
@@ -126,14 +126,14 @@ export function StageCompute({
 
           {/* Lookback period */}
           <div className="flex justify-between items-center">
-            <span className="font-mono text-[9px] tracking-widest text-nb-muted flex items-center">
+            <span className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
               LOOKBACK
               <Tooltip text="Years of daily return history to use. Longer periods smooth short-term outliers; shorter periods reflect recent market regime more closely." />
             </span>
             <div className="flex gap-1.5">
               {['1y','2y','3y','5y'].map(p => (
                 <button key={p} onClick={() => setPeriod(p)}
-                        className={`font-mono text-[9px] px-2 py-1 border transition-all nb-pop-btn ${
+                        className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
                           period === p 
                             ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]' 
                             : 'border-nb-border text-nb-dim hover:text-nb-text bg-nb-bg'
@@ -147,7 +147,7 @@ export function StageCompute({
           {/* Max weight */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <span className="font-mono text-[9px] tracking-widest text-nb-muted">MAX WEIGHT</span>
+              <span className="font-mono text-[11px] tracking-widest text-nb-muted">MAX WEIGHT</span>
               <motion.span className="font-mono text-sm text-nb-text"
                 animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 0.12 }} key={maxWeight}>
                 {(maxWeight * 100).toFixed(0)}%
@@ -161,14 +161,14 @@ export function StageCompute({
 
           {/* Covariance estimator */}
           <div className="flex justify-between items-center">
-            <span className="font-mono text-[9px] tracking-widest text-nb-muted flex items-center">
+            <span className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
               COVARIANCE
               <Tooltip text="Ledoit-Wolf shrinks the sample covariance matrix to reduce estimation error — recommended for small universes (under 30 stocks). Sample uses raw historical covariance." />
             </span>
             <div className="flex gap-1.5">
               {[['ledoit_wolf','LEDOIT-WOLF'],['sample','SAMPLE']].map(([val, label]) => (
                 <button key={val} onClick={() => setEstimator(val)}
-                        className={`font-mono text-[9px] px-2 py-1 border transition-all nb-pop-btn ${
+                        className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
                           estimator === val 
                             ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]' 
                             : 'border-nb-border text-nb-dim hover:text-nb-text bg-nb-bg'
@@ -181,14 +181,14 @@ export function StageCompute({
 
           {/* Monte Carlo sims */}
           <div className="flex justify-between items-center">
-            <span className="font-mono text-[9px] tracking-widest text-nb-muted flex items-center">
+            <span className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
               MC SIMULATIONS
               <Tooltip text="Number of random portfolios to simulate. Higher counts show a denser frontier cloud but do not change the optimal point. 5K is a good balance of speed and density." />
             </span>
             <div className="flex gap-1.5">
               {[[1000,'1K'],[5000,'5K'],[10000,'10K']].map(([val, label]) => (
                 <button key={val} onClick={() => setNSims(val)}
-                        className={`font-mono text-[9px] px-2 py-1 border transition-all nb-pop-btn ${
+                        className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
                           nSims === val 
                             ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]' 
                             : 'border-nb-border text-nb-dim hover:text-nb-text bg-nb-bg'
@@ -212,7 +212,7 @@ export function StageCompute({
               <span className="w-2 h-2 rounded-full bg-nb-amber/80" />
               <span className="w-2 h-2 rounded-full bg-nb-emerald/80" />
             </div>
-            <span className="font-mono text-[7px] tracking-[0.2em] text-nb-dim uppercase">OPTIMIZATION_ENGINE_v1.0.0 // LIVE_LOG</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] text-nb-dim uppercase">OPTIMISATION ENGINE // LIVE LOG</span>
             <span className="w-8" />
           </div>
 
@@ -220,7 +220,7 @@ export function StageCompute({
           {status === 'running' && <div className="scan-line" />}
 
           {/* Terminal Output Area */}
-          <div className="p-3 min-h-[100px] max-h-[200px] overflow-y-auto font-mono text-[9px] space-y-1.5 scrollbar-thin">
+          <div className="p-3 min-h-[100px] max-h-[200px] overflow-y-auto font-mono text-[11px] space-y-1.5 scrollbar-thin">
             <AnimatePresence initial={false}>
               {logs.map((log, i) => {
                 const isError = log.status === 'error';
@@ -259,7 +259,7 @@ export function StageCompute({
             {status === 'running' && (
               <div className="flex items-center gap-2 pl-4 py-0.5">
                 <span className="w-[6px] h-3 bg-nb-cyan cursor block" />
-                <span className="text-nb-dim font-mono text-[8px] animate-pulse">RUNNING MODEL MATH...</span>
+                <span className="text-nb-dim font-mono text-[10px] animate-pulse">RUNNING MODEL MATH...</span>
               </div>
             )}
           </div>
