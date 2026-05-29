@@ -8,11 +8,75 @@ import { SectorBreakdown } from './SectorBreakdown';
 import { ExportButton } from './ExportButton';
 import { BacktestChart } from './BacktestChart';
 import { CorrelationMatrix } from './CorrelationMatrix';
+import { AttributionDonut } from './AttributionDonut';
+import { RiskDecompositionBar } from './RiskDecompositionBar';
+import { ComparisonPanel } from './ComparisonPanel';
+
+const SECTOR_MAP = {
+  // Consumer Discretionary
+  "MRP": "Consumer Discretionary", "TFG": "Consumer Discretionary",
+  "TRU": "Consumer Discretionary", "BID": "Consumer Discretionary",
+  "PPH": "Consumer Discretionary", "MCG": "Consumer Discretionary",
+  "SUI": "Consumer Discretionary", "TSG": "Consumer Discretionary",
+  "CLH": "Consumer Discretionary",
+
+  // Consumer Staples
+  "SHP": "Consumer Staples", "PIK": "Consumer Staples",
+  "WHL": "Consumer Staples", "DCP": "Consumer Staples",
+  "CLS": "Consumer Staples", "SPAR": "Consumer Staples",
+  "RCL": "Consumer Staples", "RFG": "Consumer Staples",
+  "OCE": "Consumer Staples", "AVI": "Consumer Staples",
+  "TBS": "Consumer Staples",
+
+  // Financials
+  "SBK": "Financials", "FSR": "Financials", "NED": "Financials",
+  "ABG": "Financials", "DSY": "Financials", "SLM": "Financials",
+  "CPI": "Financials", "REM": "Financials", "OML": "Financials",
+  "OMU": "Financials", "OUT": "Financials", "INP": "Financials",
+  "INL": "Financials", "MCF": "Financials", "PMG": "Financials",
+  "PSG": "Financials", "JSE": "Financials", "SNT": "Financials",
+
+  // Resources
+  "AGL": "Resources", "BHP": "Resources", "SOL": "Resources",
+  "SAP": "Resources", "SSW": "Resources", "IMP": "Resources",
+  "GFI": "Resources", "HAR": "Resources", "AMS": "Resources",
+  "EXX": "Resources", "KIO": "Resources", "CFR": "Resources",
+  "ANG": "Resources", "GLN": "Resources", "ARI": "Resources",
+  "DGC": "Resources", "PAN": "Resources", "THA": "Resources",
+  "MER": "Resources", "REN": "Resources", "AFT": "Resources",
+
+  // Industrials
+  "BTI": "Industrials", "APN": "Industrials", "BVT": "Industrials",
+  "MNP": "Industrials", "PPC": "Industrials", "RLO": "Industrials",
+  "KAP": "Industrials", "SPG": "Industrials", "MOT": "Industrials",
+  "ZED": "Industrials", "ADH": "Industrials", "CUR": "Industrials",
+  "LHS": "Industrials", "NTC": "Industrials",
+
+  // Technology
+  "NPN": "Technology", "PRX": "Technology", "KST": "Technology",
+  "ALH": "Technology", "BYI": "Technology",
+
+  // Telecommunications
+  "MTN": "Telecommunications", "VOD": "Telecommunications",
+  "TKG": "Telecommunications", "BLU": "Telecommunications",
+
+  // Real Estate
+  "GRT": "Real Estate", "RDF": "Real Estate", "NEPI": "Real Estate",
+  "RES": "Real Estate", "HYP": "Real Estate", "VKE": "Real Estate",
+  "ATT": "Real Estate", "EQU": "Real Estate",
+};
 
 export function StageOutput({ result, runId, backtestResult, backtestStatus, isActive, benchmark, setBenchmark }) {
-  const [activeTab, setActiveTab] = useState('frontier'); // frontier | backtest
+  const [activeTab, setActiveTab] = useState('frontier'); // frontier | correlation | backtest | attribution
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [manualWeights, setManualWeights] = useState({});
+  const [savedRuns, setSavedRuns] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('jse_saved_runs') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     if (result?.weights) {
@@ -91,12 +155,55 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
     const riskValue = Math.sqrt(variance);
     const ratio = riskValue > 0 ? (expectedReturn - rfRate) / riskValue : 0;
     
+    // Recalculate component contribution to risk dynamically
+    const contributions_to_risk = {};
+    if (riskValue > 0) {
+      tickersList.forEach(t1 => {
+        const w1 = manualWeights[t1] || 0;
+        let covSum = 0;
+        tickersList.forEach(t2 => {
+          const w2 = manualWeights[t2] || 0;
+          covSum += w2 * (riskMatrix[t1]?.[t2] || 0);
+        });
+        contributions_to_risk[t1] = (w1 * covSum) / riskValue;
+      });
+    }
+    
     return {
       expected_return: expectedReturn,
       risk_value: riskValue,
-      ratio: ratio
+      ratio: ratio,
+      contributions_to_risk
     };
   }, [isAdjusting, manualWeights, result, rfRate]);
+
+  const hhi = useMemo(() => {
+    const weightsList = isAdjusting
+      ? Object.values(manualWeights)
+      : result ? result.weights.map(w => w.weight) : [];
+    return weightsList.reduce((sum, w) => sum + w * w, 0);
+  }, [result, manualWeights, isAdjusting]);
+
+  const displaySectorExposure = useMemo(() => {
+    if (!result?.weights) return [];
+    
+    const weightsToUse = isAdjusting
+      ? result.weights.map(w => ({
+          ticker: w.ticker,
+          weight: manualWeights[w.ticker] ?? w.weight
+        }))
+      : result.weights;
+
+    const exposureMap = {};
+    weightsToUse.forEach(w => {
+      const sector = SECTOR_MAP[w.ticker] || 'Other';
+      exposureMap[sector] = (exposureMap[sector] || 0) + w.weight;
+    });
+
+    return Object.entries(exposureMap)
+      .map(([sector, weight]) => ({ sector, weight: Math.max(0, Math.min(1, weight)) }))
+      .sort((a, b) => b.weight - a.weight);
+  }, [isAdjusting, manualWeights, result]);
 
   if (!result) return null;
 
@@ -127,13 +234,43 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
     weights: result.weights.map(w => ({
       ...w,
       weight: isAdjusting ? (manualWeights[w.ticker] ?? w.weight) : w.weight,
-      contribution_to_return: isAdjusting ? (manualWeights[w.ticker] ?? w.weight) * (result.asset_returns?.[w.ticker] ?? 0) : w.contribution_to_return
+      contribution_to_return: isAdjusting ? (manualWeights[w.ticker] ?? w.weight) * (result.asset_returns?.[w.ticker] ?? 0) : w.contribution_to_return,
+      contribution_to_risk: isAdjusting && customMetrics?.contributions_to_risk
+        ? (customMetrics.contributions_to_risk[w.ticker] ?? 0)
+        : w.contribution_to_risk
     })),
     expected_return: displayReturn,
     volatility: displayVolatility,
     downside_risk: displayDownsideRisk,
     sharpe_ratio: displaySharpe,
-    sortino_ratio: displaySortino
+    sortino_ratio: displaySortino,
+    sector_exposure: displaySectorExposure
+  };
+
+  const handleSaveRun = () => {
+    const run = {
+      result: exportResult,
+      backtestResult,
+      timestamp: Date.now(),
+      label: `RUN ${savedRuns.length + 1}`,
+    };
+    const updated = [...savedRuns.slice(-1), run]; // keep max 2 runs (FIFO)
+    setSavedRuns(updated);
+    localStorage.setItem('jse_saved_runs', JSON.stringify(updated));
+  };
+
+  const handleClearRuns = () => {
+    setSavedRuns([]);
+    localStorage.removeItem('jse_saved_runs');
+  };
+
+  const handleRenameRun = (index, newLabel) => {
+    const updated = [...savedRuns];
+    if (updated[index]) {
+      updated[index] = { ...updated[index], label: newLabel };
+      setSavedRuns(updated);
+      localStorage.setItem('jse_saved_runs', JSON.stringify(updated));
+    }
   };
 
   return (
@@ -145,25 +282,43 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
       <StageShell number="03" label="OUTPUT" id="stage-output" isActive={isActive}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            {/* View Switcher Tabs */}
-            <div className="flex border border-nb-border mb-4 font-mono text-[10px] tracking-widest bg-nb-bg">
-              {[
-                { key: 'frontier', label: 'FRONTIER' },
-                { key: 'correlation', label: 'CORRELATION' },
-                { key: 'backtest', label: 'BACKTEST' },
-              ].map(({ key, label }, i, arr) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveTab(key)}
-                  className={`flex-1 py-2.5 text-center transition-colors ${i < arr.length - 1 ? 'border-r border-nb-border' : ''} ${
-                    activeTab === key
-                      ? 'text-nb-cyan font-bold border-b-2 border-b-nb-cyan bg-nb-surface/60'
-                      : 'text-nb-muted hover:text-nb-text'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
+            {/* View Switcher Tabs and Save Run button */}
+            <div className="flex flex-col sm:flex-row gap-2 justify-between items-stretch sm:items-center mb-4">
+              <div className="flex border border-nb-border font-mono text-[10px] tracking-widest bg-nb-bg flex-1">
+                {[
+                  { key: 'frontier', label: 'FRONTIER' },
+                  { key: 'correlation', label: 'CORRELATION' },
+                  { key: 'backtest', label: 'BACKTEST' },
+                  { key: 'attribution', label: 'ATTRIBUTION' },
+                ].map(({ key, label }, i, arr) => (
+                  <button
+                    key={key}
+                    onClick={() => setActiveTab(key)}
+                    className={`flex-1 py-2.5 text-center transition-colors ${i < arr.length - 1 ? 'border-r border-nb-border' : ''} ${
+                      activeTab === key
+                        ? 'text-nb-cyan font-bold border-b-2 border-b-nb-cyan bg-nb-surface/60'
+                        : 'text-nb-muted hover:text-nb-text'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={handleSaveRun}
+                className={`font-mono text-[9px] tracking-widest px-3 py-2.5 border transition-all nb-pop-btn bg-nb-bg shrink-0 ${
+                  savedRuns.length === 1
+                    ? 'border-nb-amber text-nb-amber hover:border-nb-amber'
+                    : savedRuns.length === 2
+                    ? 'border-nb-muted text-nb-muted hover:border-nb-border-bright hover:text-nb-text'
+                    : 'border-nb-border text-nb-muted hover:border-nb-border-bright hover:text-nb-text'
+                }`}
+              >
+                {savedRuns.length === 0 && 'SAVE RUN'}
+                {savedRuns.length === 1 && '+ SAVE & COMPARE'}
+                {savedRuns.length === 2 && `REPLACE ${savedRuns[0].label}`}
+              </button>
             </div>
 
             {activeTab === 'frontier' && (
@@ -211,59 +366,85 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
                 )}
               </div>
             )}
+            {activeTab === 'attribution' && (
+              <div className="space-y-6 animate-fade">
+                <AttributionDonut weights={exportResult.weights} />
+                <div className="border-t border-nb-border pt-6">
+                  <RiskDecompositionBar weights={exportResult.weights} />
+                </div>
+              </div>
+            )}
 
-            {result.sector_exposure && <SectorBreakdown sectors={result.sector_exposure} />}
+            {displaySectorExposure.length > 0 && <SectorBreakdown sectors={displaySectorExposure} />}
           </div>
 
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-2">
-              <MetricCard label="EXP. RETURN" value={displayReturn * 100} runId={runId} />
+              <MetricCard
+                label="EXP. RETURN"
+                value={displayReturn * 100}
+                runId={runId}
+                ariaLabel={`Expected annual return: ${(displayReturn * 100).toFixed(2)}%`}
+              />
               <MetricCard 
                 label={isSortino ? "DOWNSIDE RISK" : "VOLATILITY"}  
                 value={(isSortino ? displayDownsideRisk : displayVolatility) * 100}      
-                runId={runId} 
+                runId={runId}
+                ariaLabel={`${isSortino ? 'Expected downside risk' : 'Expected volatility'}: ${((isSortino ? displayDownsideRisk : displayVolatility) * 100).toFixed(2)}%`}
               />
               <MetricCard 
                 label={isSortino ? "SORTINO RATIO" : "SHARPE RATIO"} 
                 value={isSortino ? displaySortino : displaySharpe} 
                 suffix="" 
                 runId={runId} 
-                isWarning={lowRatio} 
+                isWarning={lowRatio}
+                ariaLabel={`${isSortino ? 'Sortino ratio' : 'Sharpe ratio'}: ${(isSortino ? displaySortino : displaySharpe).toFixed(3)}`}
               />
             </div>
 
             {/* Advanced Risk Metrics Panel */}
             <div className="border border-nb-border p-4 bg-nb-surface/10 space-y-3">
               <div className="font-mono text-[10px] tracking-widest text-nb-muted uppercase font-bold">ADVANCED RISK METRICS</div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
-                  <div className="font-mono text-[10px] text-nb-dim uppercase tracking-wide">95% Daily VaR</div>
-                  <div className="font-mono text-sm mt-1 text-nb-text font-bold">
+                  <div className="font-mono text-[9px] text-nb-muted uppercase tracking-wider">Daily Loss Threshold (95%)</div>
+                  <div className="font-mono text-xs mt-1 text-nb-text font-bold" aria-label={`Daily Loss Threshold: ${result.var_value !== undefined ? (result.var_value * 100).toFixed(3) : 'N/A'}%`}>
                     {result.var_value !== undefined ? `${(result.var_value * 100).toFixed(3)}%` : 'N/A'}
                   </div>
                 </div>
                 <div>
-                  <div className="font-mono text-[10px] text-nb-dim uppercase tracking-wide">95% Daily CVaR</div>
-                  <div className="font-mono text-sm mt-1 text-nb-text font-bold">
+                  <div className="font-mono text-[9px] text-nb-muted uppercase tracking-wider">Average Loss in Bad Days</div>
+                  <div className="font-mono text-xs mt-1 text-nb-text font-bold" aria-label={`Average Loss in Bad Days: ${result.cvar_value !== undefined ? (result.cvar_value * 100).toFixed(3) : 'N/A'}%`}>
                     {result.cvar_value !== undefined ? `${(result.cvar_value * 100).toFixed(3)}%` : 'N/A'}
                   </div>
                 </div>
                 <div>
-                  <div className="font-mono text-[10px] text-nb-dim uppercase tracking-wide">Portfolio Beta</div>
-                  <div className="font-mono text-sm mt-1 text-nb-cyan font-bold">
+                  <div className="font-mono text-[9px] text-nb-muted uppercase tracking-wider">Market Sensitivity (β)</div>
+                  <div className="font-mono text-xs mt-1 text-nb-cyan font-bold" aria-label={`Market Sensitivity Beta: ${backtestResult?.beta !== undefined ? backtestResult.beta.toFixed(2) : 'N/A'}`}>
                     {backtestResult?.beta !== undefined ? backtestResult.beta.toFixed(2) : 'N/A'}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-mono text-[9px] text-nb-muted uppercase tracking-wider">Diversification (HHI)</div>
+                  <div className={`font-mono text-xs mt-1 font-bold ${
+                    hhi <= 0.15 ? 'text-nb-emerald' : hhi >= 0.25 ? 'text-nb-amber' : 'text-nb-text'
+                  }`} aria-label={`Diversification concentration score: ${hhi.toFixed(3)} (${hhi <= 0.15 ? 'well diversified' : hhi >= 0.25 ? 'concentrated' : 'moderate'})`}>
+                    {hhi.toFixed(3)}
+                    <span className="text-[8px] font-normal block text-nb-muted mt-0.5">
+                      {hhi <= 0.15 ? 'well spread' : hhi >= 0.25 ? 'concentrated' : 'moderate'}
+                    </span>
                   </div>
                 </div>
               </div>
               <p className="font-mono text-[9px] text-nb-dim leading-relaxed border-t border-nb-border pt-2">
-                VaR: minimum expected loss over 1 day at 95% confidence. CVaR (Expected Shortfall): average loss in the worst 5% of days. Beta: market sensitivity vs. chosen benchmark.
+                Daily Loss Threshold (95% VaR): on a typical bad day, you'd lose at most this much. Average Loss in Bad Days (95% CVaR): average loss on the worst 5% of days. Market Sensitivity (Beta): portfolio movement relative to selected benchmark. Diversification score: lower is more diversified. Below 0.15 = well spread. Above 0.25 = concentrated in few holdings.
               </p>
             </div>
 
             {/* Adjust Weights Toggle Widget */}
             {result.asset_returns && result.covariance && (
               <div className="flex justify-between items-center border border-nb-border px-3 py-2.5 bg-nb-surface/40">
-                <span className="font-mono text-[10px] tracking-widest text-nb-muted font-bold">SIMULATE MANUAL WEIGHTS</span>
+                <span className="font-mono text-[10px] tracking-widest text-nb-muted font-bold">ADJUST WEIGHTS MANUALLY</span>
                 <button
                   onClick={() => {
                     if (isAdjusting) {
@@ -316,7 +497,23 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
             <ExportButton result={exportResult} />
           </div>
         </div>
+
+        {savedRuns.length === 2 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="mt-6 border-t border-nb-border pt-6"
+          >
+            <ComparisonPanel
+              savedRuns={savedRuns}
+              onClear={handleClearRuns}
+              onRenameRun={handleRenameRun}
+            />
+          </motion.div>
+        )}
       </StageShell>
     </motion.div>
   );
 }
+

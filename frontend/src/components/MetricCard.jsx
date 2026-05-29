@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useCountUp } from '../hooks/useCountUp';
 import { useTextScramble } from '../hooks/useTextScramble';
 
-export function MetricCard({ label, value, suffix = '%', runId, isWarning = false }) {
+export function MetricCard({ label, value, suffix = '%', runId, isWarning = false, ariaLabel }) {
   const animated = useCountUp(value, 900, 2);
   const color = isWarning ? 'text-nb-amber' : 'text-nb-emerald';
   const bracketColor = isWarning ? 'border-nb-amber' : 'border-nb-emerald';
@@ -19,6 +19,7 @@ export function MetricCard({ label, value, suffix = '%', runId, isWarning = fals
       className="relative border-2 border-nb-border p-3 bg-nb-surface/10 nb-pop-card cursor-default"
       animate={{ borderColor: [isWarning ? '#FFB340' : '#00C853', '#2C2C2E'] }}
       transition={{ duration: 0.8, delay: 0.3 }}
+      aria-label={ariaLabel}
     >
       {/* Blueprint Corner Brackets */}
       <div className={`absolute top-[-2px] left-[-2px] w-1.5 h-1.5 border-t-2 border-l-2 ${bracketColor}`} />
