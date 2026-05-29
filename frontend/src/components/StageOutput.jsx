@@ -282,9 +282,9 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
       <StageShell number="03" label="OUTPUT" id="stage-output" isActive={isActive}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            {/* View Switcher Tabs and Save Run button */}
-            <div className="flex flex-col sm:flex-row gap-2 justify-between items-stretch sm:items-center mb-4">
-              <div className="flex border border-nb-border font-mono text-[10px] tracking-widest bg-nb-bg flex-1">
+            {/* View Switcher Tabs */}
+            <div className="mb-1">
+              <div className="flex border border-nb-border font-mono text-[9px] tracking-wider bg-nb-bg">
                 {[
                   { key: 'frontier', label: 'FRONTIER' },
                   { key: 'correlation', label: 'CORRELATION' },
@@ -294,7 +294,7 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
                   <button
                     key={key}
                     onClick={() => setActiveTab(key)}
-                    className={`flex-1 py-2.5 text-center transition-colors ${i < arr.length - 1 ? 'border-r border-nb-border' : ''} ${
+                    className={`flex-1 py-3 text-center transition-colors ${i < arr.length - 1 ? 'border-r border-nb-border' : ''} ${
                       activeTab === key
                         ? 'text-nb-cyan font-bold border-b-2 border-b-nb-cyan bg-nb-surface/60'
                         : 'text-nb-muted hover:text-nb-text'
@@ -304,21 +304,23 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
                   </button>
                 ))}
               </div>
-
-              <button
-                onClick={handleSaveRun}
-                className={`font-mono text-[9px] tracking-widest px-3 py-2.5 border transition-all nb-pop-btn bg-nb-bg shrink-0 ${
-                  savedRuns.length === 1
-                    ? 'border-nb-amber text-nb-amber hover:border-nb-amber'
-                    : savedRuns.length === 2
-                    ? 'border-nb-muted text-nb-muted hover:border-nb-border-bright hover:text-nb-text'
-                    : 'border-nb-border text-nb-muted hover:border-nb-border-bright hover:text-nb-text'
-                }`}
-              >
-                {savedRuns.length === 0 && 'SAVE RUN'}
-                {savedRuns.length === 1 && '+ SAVE & COMPARE'}
-                {savedRuns.length === 2 && `REPLACE ${savedRuns[0].label}`}
-              </button>
+              {/* Save Run button — sits flush below the tab bar */}
+              <div className="flex justify-end mt-2 mb-4">
+                <button
+                  onClick={handleSaveRun}
+                  className={`font-mono text-[9px] tracking-widest px-3 py-1.5 border transition-all nb-pop-btn bg-nb-bg ${
+                    savedRuns.length === 1
+                      ? 'border-nb-amber text-nb-amber'
+                      : savedRuns.length === 2
+                      ? 'border-nb-muted text-nb-muted hover:text-nb-text'
+                      : 'border-nb-border text-nb-muted hover:text-nb-text'
+                  }`}
+                >
+                  {savedRuns.length === 0 && 'SAVE RUN'}
+                  {savedRuns.length === 1 && '+ SAVE & COMPARE'}
+                  {savedRuns.length === 2 && `REPLACE ${savedRuns[0].label}`}
+                </button>
+              </div>
             </div>
 
             {activeTab === 'frontier' && (
@@ -379,7 +381,7 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
           </div>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-3">
               <MetricCard
                 label="EXP. RETURN"
                 value={displayReturn * 100}
@@ -403,42 +405,43 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
             </div>
 
             {/* Advanced Risk Metrics Panel */}
-            <div className="border border-nb-border p-4 bg-nb-surface/10 space-y-3">
-              <div className="font-mono text-[10px] tracking-widest text-nb-muted uppercase font-bold">ADVANCED RISK METRICS</div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div>
-                  <div className="font-mono text-[9px] text-nb-muted uppercase tracking-wider">Daily Loss Threshold (95%)</div>
-                  <div className="font-mono text-xs mt-1 text-nb-text font-bold" aria-label={`Daily Loss Threshold: ${result.var_value !== undefined ? (result.var_value * 100).toFixed(3) : 'N/A'}%`}>
-                    {result.var_value !== undefined ? `${(result.var_value * 100).toFixed(3)}%` : 'N/A'}
+            <div className="border border-nb-border p-4 bg-nb-surface/10 space-y-4">
+              <div className="font-mono text-[10px] tracking-widest text-nb-muted uppercase font-bold">RISK METRICS</div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <div className="space-y-1">
+                  <div className="font-mono text-[9px] text-nb-dim uppercase tracking-wide">Daily Loss Threshold</div>
+                  <div className="font-mono text-base text-nb-text font-bold">
+                    {result.var_value !== undefined ? `${(result.var_value * 100).toFixed(2)}%` : 'N/A'}
                   </div>
+                  <div className="font-mono text-[8px] text-nb-dim">worst loss on a typical bad day (95%)</div>
                 </div>
-                <div>
-                  <div className="font-mono text-[9px] text-nb-muted uppercase tracking-wider">Average Loss in Bad Days</div>
-                  <div className="font-mono text-xs mt-1 text-nb-text font-bold" aria-label={`Average Loss in Bad Days: ${result.cvar_value !== undefined ? (result.cvar_value * 100).toFixed(3) : 'N/A'}%`}>
-                    {result.cvar_value !== undefined ? `${(result.cvar_value * 100).toFixed(3)}%` : 'N/A'}
+                <div className="space-y-1">
+                  <div className="font-mono text-[9px] text-nb-dim uppercase tracking-wide">Avg Loss in Bad Days</div>
+                  <div className="font-mono text-base text-nb-text font-bold">
+                    {result.cvar_value !== undefined ? `${(result.cvar_value * 100).toFixed(2)}%` : 'N/A'}
                   </div>
+                  <div className="font-mono text-[8px] text-nb-dim">average loss on the worst 5% of days</div>
                 </div>
-                <div>
-                  <div className="font-mono text-[9px] text-nb-muted uppercase tracking-wider">Market Sensitivity (β)</div>
-                  <div className="font-mono text-xs mt-1 text-nb-cyan font-bold" aria-label={`Market Sensitivity Beta: ${backtestResult?.beta !== undefined ? backtestResult.beta.toFixed(2) : 'N/A'}`}>
+                <div className="space-y-1">
+                  <div className="font-mono text-[9px] text-nb-dim uppercase tracking-wide">Market Sensitivity (β)</div>
+                  <div className="font-mono text-base text-nb-cyan font-bold">
                     {backtestResult?.beta !== undefined ? backtestResult.beta.toFixed(2) : 'N/A'}
                   </div>
+                  <div className="font-mono text-[8px] text-nb-dim">how much portfolio moves vs. the JSE</div>
                 </div>
-                <div>
-                  <div className="font-mono text-[9px] text-nb-muted uppercase tracking-wider">Diversification (HHI)</div>
-                  <div className={`font-mono text-xs mt-1 font-bold ${
+                <div className="space-y-1">
+                  <div className="font-mono text-[9px] text-nb-dim uppercase tracking-wide">Diversification Score</div>
+                  <div className={`font-mono text-base font-bold ${
                     hhi <= 0.15 ? 'text-nb-emerald' : hhi >= 0.25 ? 'text-nb-amber' : 'text-nb-text'
-                  }`} aria-label={`Diversification concentration score: ${hhi.toFixed(3)} (${hhi <= 0.15 ? 'well diversified' : hhi >= 0.25 ? 'concentrated' : 'moderate'})`}>
+                  }`}>
                     {hhi.toFixed(3)}
-                    <span className="text-[8px] font-normal block text-nb-muted mt-0.5">
-                      {hhi <= 0.15 ? 'well spread' : hhi >= 0.25 ? 'concentrated' : 'moderate'}
+                    <span className="font-mono text-[9px] font-normal ml-2">
+                      {hhi <= 0.15 ? '— well spread' : hhi >= 0.25 ? '— concentrated' : '— moderate'}
                     </span>
                   </div>
+                  <div className="font-mono text-[8px] text-nb-dim">lower = more diversified (ideal &lt; 0.15)</div>
                 </div>
               </div>
-              <p className="font-mono text-[9px] text-nb-dim leading-relaxed border-t border-nb-border pt-2">
-                Daily Loss Threshold (95% VaR): on a typical bad day, you'd lose at most this much. Average Loss in Bad Days (95% CVaR): average loss on the worst 5% of days. Market Sensitivity (Beta): portfolio movement relative to selected benchmark. Diversification score: lower is more diversified. Below 0.15 = well spread. Above 0.25 = concentrated in few holdings.
-              </p>
             </div>
 
             {/* Adjust Weights Toggle Widget */}

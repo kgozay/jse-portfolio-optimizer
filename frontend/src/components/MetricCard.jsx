@@ -16,19 +16,19 @@ export function MetricCard({ label, value, suffix = '%', runId, isWarning = fals
   return (
     <motion.div
       key={runId}
-      className="relative border-2 border-nb-border p-3 bg-nb-surface/10 nb-pop-card cursor-default"
+      className="relative border-2 border-nb-border p-4 bg-nb-surface/10 nb-pop-card cursor-default min-h-[90px] flex flex-col justify-between"
       animate={{ borderColor: [isWarning ? '#FFB340' : '#00C853', '#2C2C2E'] }}
       transition={{ duration: 0.8, delay: 0.3 }}
       aria-label={ariaLabel}
     >
       {/* Blueprint Corner Brackets */}
-      <div className={`absolute top-[-2px] left-[-2px] w-1.5 h-1.5 border-t-2 border-l-2 ${bracketColor}`} />
-      <div className={`absolute top-[-2px] right-[-2px] w-1.5 h-1.5 border-t-2 border-r-2 ${bracketColor}`} />
-      <div className={`absolute bottom-[-2px] left-[-2px] w-1.5 h-1.5 border-b-2 border-l-2 ${bracketColor}`} />
-      <div className={`absolute bottom-[-2px] right-[-2px] w-1.5 h-1.5 border-b-2 border-r-2 ${bracketColor}`} />
+      <div className={`absolute top-[-2px] left-[-2px] w-2 h-2 border-t-2 border-l-2 ${bracketColor}`} />
+      <div className={`absolute top-[-2px] right-[-2px] w-2 h-2 border-t-2 border-r-2 ${bracketColor}`} />
+      <div className={`absolute bottom-[-2px] left-[-2px] w-2 h-2 border-b-2 border-l-2 ${bracketColor}`} />
+      <div className={`absolute bottom-[-2px] right-[-2px] w-2 h-2 border-b-2 border-r-2 ${bracketColor}`} />
 
-      <div className="font-mono text-[10px] tracking-widest text-nb-muted uppercase leading-tight">{scrambledLabel}</div>
-      <div className={`font-mono text-lg md:text-xl mt-1.5 font-bold ${color}`}>
+      <div className="font-mono text-[9px] tracking-wide text-nb-muted uppercase leading-none">{scrambledLabel}</div>
+      <div className={`font-mono text-2xl font-bold mt-2 ${color}`}>
         {scrambledValue}
       </div>
     </motion.div>

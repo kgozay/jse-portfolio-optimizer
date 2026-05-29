@@ -6,9 +6,9 @@ export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onCh
       initial={{ opacity: 0, x: 14 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay, duration: 0.25 }}
-      className="flex items-center gap-2 py-1"
+      className="flex items-center gap-3 py-1.5"
     >
-      <span className="font-mono text-[11px] text-nb-muted w-9 shrink-0 font-bold">{ticker}</span>
+      <span className="font-mono text-[11px] text-nb-muted w-10 shrink-0 font-bold tracking-wider">{ticker}</span>
       {isAdjusting ? (
         <input
           type="range"
@@ -23,7 +23,7 @@ export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onCh
           }}
         />
       ) : (
-        <div className="flex-1 bg-nb-surface h-[4px]">
+        <div className="flex-1 bg-nb-surface h-[5px]">
           <motion.div
             className="bg-nb-emerald h-full"
             initial={{ width: '0%' }}
@@ -32,7 +32,7 @@ export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onCh
           />
         </div>
       )}
-      <span className="font-mono text-[11px] text-nb-text w-12 text-right font-bold">
+      <span className="font-mono text-sm text-nb-text w-14 text-right font-bold">
         {(weight * 100).toFixed(1)}%
       </span>
     </motion.div>
