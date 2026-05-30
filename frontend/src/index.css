@@ -24,6 +24,7 @@
   background: linear-gradient(to right, transparent, #00D4FF, transparent);
   box-shadow: 0 0 8px #00D4FF;
   pointer-events: none;
+  will-change: transform;
   animation: scan-sweep 2.5s infinite linear;
 }
 

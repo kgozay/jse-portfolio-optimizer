@@ -131,7 +131,7 @@ export default function App() {
 
               <ColdStartBanner />
 
-              <div className="flex flex-col mt-6">
+              <main aria-label="Portfolio optimisation pipeline" className="flex flex-col mt-6">
                 <StageInput 
                   tickers={tickers} 
                   setTickers={setTickers} 
@@ -173,7 +173,7 @@ export default function App() {
                     />
                   )}
                 </AnimatePresence>
-              </div>
+              </main>
             </div>
           </div>
         </motion.div>

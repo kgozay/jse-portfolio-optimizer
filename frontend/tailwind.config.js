@@ -10,7 +10,7 @@ module.exports = {
           'border-bright':'#3A3A3C',
           text:           '#E0E0E2',
           muted:          '#A0A0A5',
-          dim:            '#7E7E83',
+          dim:            '#8E8E93',
           cyan:           '#00D4FF',
           emerald:        '#00C853',
           red:            '#FF453A',

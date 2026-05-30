@@ -68,7 +68,7 @@ export function StageInput({ tickers, setTickers, onOptimise, optimiseDisabled, 
               setTickers(newTickers);
               newTickers.forEach(t => validate(t.ticker));
             }}
-            className="border border-nb-border px-2 py-0.5 hover:border-nb-cyan hover:text-nb-cyan transition-all text-nb-dim bg-nb-surface/40 hover:bg-nb-cyan/5 nb-pop-btn"
+            className="border border-nb-border px-2 py-1.5 hover:border-nb-cyan hover:text-nb-cyan transition-all text-nb-dim bg-nb-surface/40 hover:bg-nb-cyan/5 nb-pop-btn"
           >
             {p.label}
           </button>

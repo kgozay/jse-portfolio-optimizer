@@ -92,8 +92,6 @@ export function LandingPage({ onLaunch }) {
         }}
       />
 
-      {/* Background Cyber Glowing Orb */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-nb-cyan/5 rounded-full blur-[140px] pointer-events-none z-0" />
       
       {/* Subtle Scan sweep line on background */}
       <div className="absolute inset-0 pointer-events-none opacity-20 z-0">
@@ -187,20 +185,20 @@ export function LandingPage({ onLaunch }) {
             ].map(({ num, title, body, accent, numColor, hoverShadow }) => (
               <div
                 key={num}
-                className={`border border-nb-border bg-nb-surface/60 backdrop-blur-sm p-6 transition-all duration-200 cursor-default rounded-[4px]
+                className={`border border-nb-border bg-nb-surface/60 p-6 transition-all duration-200 cursor-default rounded-[4px]
                            hover:-translate-y-1 hover:-translate-x-1 ${hoverShadow}
                            group flex flex-col justify-between min-h-[160px] relative overflow-hidden`}
+                style={{ borderTopColor: accent, borderTopWidth: '2px' }}
               >
                 {/* Subtle Blueprint Dot Grid Background */}
-                <div 
-                  className="absolute inset-0 opacity-[0.02] pointer-events-none" 
+                <div
+                  className="absolute inset-0 opacity-[0.02] pointer-events-none"
                   style={{
                     backgroundImage: 'radial-gradient(#E0E0E2 1px, transparent 1px)',
                     backgroundSize: '16px 16px'
-                  }} 
+                  }}
                 />
-                <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: accent }} />
-                <div className="pl-3">
+                <div>
                   <p className={`font-mono text-xs ${numColor} font-bold tracking-widest mb-3`}>
                     {num} / <ScrambleOnHover text={title} duration={500} />
                   </p>

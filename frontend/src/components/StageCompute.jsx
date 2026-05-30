@@ -78,7 +78,7 @@ export function StageCompute({
 
           {/* Risk-free rate */}
           <div className="flex justify-between items-center">
-            <span className="font-mono text-[11px] tracking-widest text-nb-muted">RISK-FREE RATE</span>
+            <span id="lbl-rf" className="font-mono text-[11px] tracking-widest text-nb-muted">RISK-FREE RATE</span>
             <div className="flex items-center gap-2">
               <input
                 type="number"
@@ -87,6 +87,7 @@ export function StageCompute({
                 step="0.01"
                 value={rfInput}
                 onChange={handleRfChange}
+                aria-labelledby="lbl-rf"
                 className="w-16 bg-transparent text-right font-mono text-sm text-nb-text
                            border border-nb-border focus:border-nb-cyan outline-none px-1"
               />
@@ -115,16 +116,17 @@ export function StageCompute({
           {/* Optimisation Target Objective */}
           <div className="flex flex-col gap-1">
             <div className="flex justify-between items-center">
-              <span className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
+              <span id="lbl-objective" className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
                 OPTIMISATION TARGET
                 <Tooltip text="Max Sharpe: maximises return per unit of total risk. Min Volatility: minimises portfolio standard deviation. Max Sortino: maximises return per unit of downside risk only." />
               </span>
-              <div className="flex gap-1.5">
+              <div role="group" aria-labelledby="lbl-objective" className="flex gap-1.5">
                 {OBJECTIVE_OPTIONS.map(([val, label]) => (
                   <button key={val} onClick={() => setObjective(val)}
+                          aria-pressed={objective === val}
                           className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
-                            objective === val 
-                              ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]' 
+                            objective === val
+                              ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]'
                               : 'border-nb-border text-nb-dim hover:text-nb-text bg-nb-bg'
                           }`}>
                     {label}
@@ -141,16 +143,17 @@ export function StageCompute({
 
           {/* Lookback period */}
           <div className="flex justify-between items-center">
-            <span className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
+            <span id="lbl-lookback" className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
               LOOKBACK
               <Tooltip text="Years of daily return history to use. Longer periods smooth short-term outliers; shorter periods reflect recent market regime more closely." />
             </span>
-            <div className="flex gap-1.5">
+            <div role="group" aria-labelledby="lbl-lookback" className="flex gap-1.5">
               {PERIOD_OPTIONS.map(p => (
                 <button key={p} onClick={() => setPeriod(p)}
+                        aria-pressed={period === p}
                         className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
-                          period === p 
-                            ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]' 
+                          period === p
+                            ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]'
                             : 'border-nb-border text-nb-dim hover:text-nb-text bg-nb-bg'
                         }`}>
                   {p.toUpperCase()}
@@ -182,16 +185,17 @@ export function StageCompute({
 
           {/* Covariance estimator */}
           <div className="flex justify-between items-center">
-            <span className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
+            <span id="lbl-covariance" className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
               COVARIANCE
               <Tooltip text="Ledoit-Wolf shrinks the sample covariance matrix to reduce estimation error — recommended for small universes (under 30 stocks). Sample uses raw historical covariance." />
             </span>
-            <div className="flex gap-1.5">
+            <div role="group" aria-labelledby="lbl-covariance" className="flex gap-1.5">
               {ESTIMATOR_OPTIONS.map(([val, label]) => (
                 <button key={val} onClick={() => setEstimator(val)}
+                        aria-pressed={estimator === val}
                         className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
-                          estimator === val 
-                            ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]' 
+                          estimator === val
+                            ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]'
                             : 'border-nb-border text-nb-dim hover:text-nb-text bg-nb-bg'
                         }`}>
                   {label}
@@ -202,16 +206,17 @@ export function StageCompute({
 
           {/* Monte Carlo sims */}
           <div className="flex justify-between items-center">
-            <span className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
+            <span id="lbl-sims" className="font-mono text-[11px] tracking-widest text-nb-muted flex items-center">
               MC SIMULATIONS
               <Tooltip text="Number of random portfolios to simulate. Higher counts show a denser frontier cloud but do not change the optimal point. 5K is a good balance of speed and density." />
             </span>
-            <div className="flex gap-1.5">
+            <div role="group" aria-labelledby="lbl-sims" className="flex gap-1.5">
               {SIM_OPTIONS.map(([val, label]) => (
                 <button key={val} onClick={() => setNSims(val)}
+                        aria-pressed={nSims === val}
                         className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
-                          nSims === val 
-                            ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]' 
+                          nSims === val
+                            ? 'border-nb-cyan text-nb-cyan bg-nb-cyan/5 font-bold shadow-[2px_2px_0px_0px_#00D4FF]'
                             : 'border-nb-border text-nb-dim hover:text-nb-text bg-nb-bg'
                         }`}>
                   {label}

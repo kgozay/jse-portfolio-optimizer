@@ -5,8 +5,9 @@ export function StageShell({ number, label, children, id, isActive = false }) {
   const scrambledLabel = useTextScramble(label, 500);
 
   return (
-    <motion.section 
-      id={id} 
+    <motion.section
+      id={id}
+      aria-label={`Stage ${number}: ${label}`}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
