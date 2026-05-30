@@ -11,10 +11,10 @@ export function Tooltip({ text }) {
         onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
-        className="font-mono text-[10px] text-nb-dim border border-nb-border w-4 h-4
+        className="font-mono text-[10px] text-nb-dim border border-nb-border w-5 h-5
                    flex items-center justify-center hover:border-nb-cyan hover:text-nb-cyan
-                   transition-colors leading-none"
-        aria-label="More information"
+                   transition-colors leading-none min-w-[20px]"
+        aria-label={`More information: ${text}`}
       >
         ?
       </button>

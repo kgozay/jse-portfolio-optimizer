@@ -103,7 +103,7 @@ export function ComparisonPanel({ savedRuns, onClear, onRenameRun }) {
       </div>
 
       {/* Comparison Grid */}
-      <div className="grid grid-cols-7 gap-4 items-start pt-2">
+      <div className="grid grid-cols-1 sm:grid-cols-7 gap-4 items-start pt-2">
         {/* Run A Column */}
         <div className="col-span-3 space-y-2 border-r border-nb-border/40 pr-2">
           {editingIndex === 0 ? (
@@ -123,7 +123,7 @@ export function ComparisonPanel({ savedRuns, onClear, onRenameRun }) {
               <span className="font-mono text-xs font-bold text-nb-text uppercase tracking-wide border-b border-dashed border-nb-dim">
                 {run1.label}
               </span>
-              <svg className="w-2.5 h-2.5 text-nb-muted fill-current" viewBox="0 0 24 24">
+              <svg aria-label="Rename run" role="img" className="w-2.5 h-2.5 text-nb-muted fill-current" viewBox="0 0 24 24">
                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
               </svg>
             </div>
@@ -160,7 +160,7 @@ export function ComparisonPanel({ savedRuns, onClear, onRenameRun }) {
               <span className="font-mono text-xs font-bold text-nb-text uppercase tracking-wide border-b border-dashed border-nb-dim">
                 {run2.label}
               </span>
-              <svg className="w-2.5 h-2.5 text-nb-muted fill-current" viewBox="0 0 24 24">
+              <svg aria-label="Rename run" role="img" className="w-2.5 h-2.5 text-nb-muted fill-current" viewBox="0 0 24 24">
                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
               </svg>
             </div>
@@ -175,9 +175,9 @@ export function ComparisonPanel({ savedRuns, onClear, onRenameRun }) {
       </div>
 
       {/* Side-by-Side Key Metrics Table */}
-      <div className="border border-nb-border bg-nb-surface/40 px-3 py-1 mt-4">
+      <div className="border border-nb-border bg-nb-surface/40 px-3 py-1 mt-4 overflow-x-auto">
         {/* Table Rows */}
-        <div className="grid grid-cols-7 py-2 border-b border-nb-border/40 font-mono text-[9px] text-nb-muted uppercase font-bold tracking-wider">
+        <div className="grid grid-cols-7 py-2 border-b border-nb-border/40 font-mono text-[9px] text-nb-muted uppercase font-bold tracking-wider overflow-x-auto">
           <div className="col-span-3 text-left">METRIC</div>
           <div className="col-span-2 text-right">{run1.label}</div>
           <div className="col-span-2 text-right">{run2.label}</div>

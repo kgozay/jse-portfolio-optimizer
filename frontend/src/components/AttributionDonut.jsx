@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { CHART_PALETTE, C } from '../lib/colours';
 
-const PALETTE = ['#00C853', '#00D4FF', '#FFB340', '#BF5AF2', '#0A84FF', '#FF9F0A'];
+const PALETTE = CHART_PALETTE;
 
 export function AttributionDonut({ weights }) {
   const { pieData, netReturn, hasDrag } = useMemo(() => {
@@ -26,7 +27,7 @@ export function AttributionDonut({ weights }) {
       data.push({
         ticker: 'DRAG',
         value: dragTotal,
-        color: '#FF453A',
+        color: C.red,
         isDrag: true,
       });
     }
@@ -60,7 +61,7 @@ export function AttributionDonut({ weights }) {
                 paddingAngle={2}
                 dataKey="value"
                 nameKey="ticker"
-                stroke="#0C0C0D"
+                stroke={C.bg}
                 strokeWidth={2}
                 isAnimationActive={true}
               >

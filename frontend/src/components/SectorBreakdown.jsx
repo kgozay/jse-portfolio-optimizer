@@ -1,16 +1,5 @@
 import { useState } from 'react';
-
-const SECTOR_COLORS = {
-  'Financials':              '#FFB340',
-  'Resources':               '#FF453A',
-  'Industrials':             '#BF5AF2',
-  'Consumer Discretionary':  '#00D4FF',
-  'Consumer Staples':        '#30D158',
-  'Technology':              '#0A84FF',
-  'Telecommunications':      '#FF9F0A',
-  'Real Estate':             '#5E5CE6',
-  'Other':                   '#646464',
-};
+import { SECTOR_COLORS } from '../lib/colours';
 
 export function SectorBreakdown({ sectors }) {
   const [hoveredSector, setHoveredSector] = useState(null);

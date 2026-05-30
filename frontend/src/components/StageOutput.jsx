@@ -12,6 +12,13 @@ import { AttributionDonut } from './AttributionDonut';
 import { RiskDecompositionBar } from './RiskDecompositionBar';
 import { ComparisonPanel } from './ComparisonPanel';
 
+const TABS = [
+  { key: 'frontier',    label: 'FRONTIER' },
+  { key: 'correlation', label: 'CORRELATION' },
+  { key: 'backtest',    label: 'BACKTEST' },
+  { key: 'attribution', label: 'ATTRIBUTION' },
+];
+
 const SECTOR_MAP = {
   // Consumer Discretionary
   "MRP": "Consumer Discretionary", "TFG": "Consumer Discretionary",
@@ -284,18 +291,16 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
           <div>
             {/* View Switcher Tabs & Actions */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-              <div className="flex-1 flex border border-nb-border font-mono text-[9px] tracking-wider bg-nb-bg">
-                {[
-                  { key: 'frontier', label: 'FRONTIER' },
-                  { key: 'correlation', label: 'CORRELATION' },
-                  { key: 'backtest', label: 'BACKTEST' },
-                  { key: 'attribution', label: 'ATTRIBUTION' },
-                ].map(({ key, label }, i, arr) => (
+              <div role="tablist" aria-label="Portfolio analysis views" className="flex-1 flex border border-nb-border font-mono text-[9px] tracking-wider bg-nb-bg">
+                {TABS.map(({ key, label }, i) => (
                   <button
                     key={key}
+                    role="tab"
+                    aria-selected={activeTab === key}
+                    aria-controls={`tabpanel-${key}`}
                     onClick={() => setActiveTab(key)}
                     className={`flex-grow flex-shrink flex-1 py-3 text-center min-w-0 overflow-hidden text-ellipsis whitespace-nowrap transition-colors ${
-                      i < arr.length - 1 ? 'border-r border-nb-border' : ''
+                      i < TABS.length - 1 ? 'border-r border-nb-border' : ''
                     } ${
                       activeTab === key
                         ? 'text-nb-cyan font-bold border-b-2 border-b-nb-cyan bg-nb-surface/60'
@@ -413,21 +418,21 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
                   <div className="font-mono text-base text-nb-text font-bold">
                     {result.var_value !== undefined ? `${(result.var_value * 100).toFixed(2)}%` : 'N/A'}
                   </div>
-                  <div className="font-mono text-[8px] text-nb-dim">worst loss on a typical bad day (95%)</div>
+                  <div className="font-mono text-[11px] text-nb-dim">worst loss on a typical bad day (95%)</div>
                 </div>
                 <div className="space-y-1">
                   <div className="font-mono text-[9px] text-nb-dim uppercase tracking-wide">Avg Loss in Bad Days</div>
                   <div className="font-mono text-base text-nb-text font-bold">
                     {result.cvar_value !== undefined ? `${(result.cvar_value * 100).toFixed(2)}%` : 'N/A'}
                   </div>
-                  <div className="font-mono text-[8px] text-nb-dim">average loss on the worst 5% of days</div>
+                  <div className="font-mono text-[11px] text-nb-dim">average loss on the worst 5% of days</div>
                 </div>
                 <div className="space-y-1">
                   <div className="font-mono text-[9px] text-nb-dim uppercase tracking-wide">Market Sensitivity (β)</div>
                   <div className="font-mono text-base text-nb-cyan font-bold">
                     {backtestResult?.beta !== undefined ? backtestResult.beta.toFixed(2) : 'N/A'}
                   </div>
-                  <div className="font-mono text-[8px] text-nb-dim">how much portfolio moves vs. the JSE</div>
+                  <div className="font-mono text-[11px] text-nb-dim">how much portfolio moves vs. the JSE</div>
                 </div>
                 <div className="space-y-1">
                   <div className="font-mono text-[9px] text-nb-dim uppercase tracking-wide">Diversification Score</div>
@@ -439,7 +444,7 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
                       {hhi <= 0.15 ? '— well spread' : hhi >= 0.25 ? '— concentrated' : '— moderate'}
                     </span>
                   </div>
-                  <div className="font-mono text-[8px] text-nb-dim">lower = more diversified (ideal &lt; 0.15)</div>
+                  <div className="font-mono text-[11px] text-nb-dim">lower = more diversified (ideal &lt; 0.15)</div>
                 </div>
               </div>
             </div>

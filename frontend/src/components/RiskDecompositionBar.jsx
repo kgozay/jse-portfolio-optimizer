@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from 'recharts';
+import { C } from '../lib/colours';
 
 export function RiskDecompositionBar({ weights }) {
   const { data, totalRisk } = useMemo(() => {
@@ -40,19 +41,19 @@ export function RiskDecompositionBar({ weights }) {
             layout="vertical"
             margin={{ top: 10, right: 20, bottom: 5, left: 10 }}
           >
-            <CartesianGrid stroke="#191919" strokeDasharray="none" horizontal={false} />
+            <CartesianGrid stroke={C.grid} strokeDasharray="none" horizontal={false} />
             <XAxis
               type="number"
               tickFormatter={v => `${v.toFixed(0)}%`}
-              tick={{ fill: '#666', fontSize: 9, fontFamily: 'monospace' }}
-              stroke="#2C2C2E"
+              tick={{ fill: C.axis, fontSize: 9, fontFamily: 'monospace' }}
+              stroke={C.border}
             />
             <YAxis
               type="category"
               dataKey="ticker"
-              tick={{ fill: '#8E8E93', fontSize: 9, fontFamily: 'monospace', fontWeight: 'bold' }}
+              tick={{ fill: C.dim, fontSize: 9, fontFamily: 'monospace', fontWeight: 'bold' }}
               width={40}
-              stroke="#2C2C2E"
+              stroke={C.border}
             />
             <Tooltip
               content={({ active, payload }) => {
@@ -75,7 +76,7 @@ export function RiskDecompositionBar({ weights }) {
               {data.map((entry, idx) => (
                 <Cell
                   key={`cell-${idx}`}
-                  fill={entry.pct >= 0 ? '#00D4FF' : '#FF453A'}
+                  fill={entry.pct >= 0 ? C.cyan : C.red}
                 />
               ))}
             </Bar>

@@ -3,6 +3,7 @@ import {
   ScatterChart, Scatter, XAxis, YAxis, CartesianGrid,
   Tooltip, ReferenceLine, ResponsiveContainer
 } from 'recharts';
+import { C } from '../lib/colours';
 
 function PortfolioTooltip({ active, payload, rfRate, isSortino }) {
   if (!active || !payload?.length) return null;
@@ -62,39 +63,39 @@ export function FrontierChart({ result, customPoint, onFrontierClick }) {
     <div className="space-y-2">
       <ResponsiveContainer width="100%" height={340}>
         <ScatterChart margin={{ top: 12, right: 12, bottom: 24, left: 16 }}>
-          <CartesianGrid stroke="#191919" strokeDasharray="none" />
-          <XAxis 
+          <CartesianGrid stroke={C.grid} strokeDasharray="none" />
+          <XAxis
             type="number"
-            dataKey="vol" 
+            dataKey="vol"
             name="Risk"
             tickFormatter={v => `${(v*100).toFixed(0)}%`}
-            tick={{ fill: '#666', fontSize: 9, fontFamily: 'monospace' }}
+            tick={{ fill: C.axis, fontSize: 9, fontFamily: 'monospace' }}
             domain={['auto', 'auto']}
-            label={{ value: isSortino ? 'DOWNSIDE RISK (SEMI-DEVIATION)' : 'VOLATILITY (STANDARD DEVIATION)', position: 'insideBottom', offset: -10, fill: '#666', fontSize: 8, fontFamily: 'monospace', tracking: '0.05em' }}
+            label={{ value: isSortino ? 'DOWNSIDE RISK (SEMI-DEVIATION)' : 'VOLATILITY (STANDARD DEVIATION)', position: 'insideBottom', offset: -10, fill: C.axis, fontSize: 9, fontFamily: 'monospace', tracking: '0.05em' }}
           />
-          <YAxis 
+          <YAxis
             type="number"
-            dataKey="ret" 
+            dataKey="ret"
             name="Expected Return"
             tickFormatter={v => `${(v*100).toFixed(0)}%`}
-            tick={{ fill: '#666', fontSize: 9, fontFamily: 'monospace' }}
+            tick={{ fill: C.axis, fontSize: 9, fontFamily: 'monospace' }}
             domain={['auto', 'auto']}
-            label={{ value: 'EXPECTED ANNUAL RETURN', angle: -90, position: 'insideLeft', offset: 0, fill: '#666', fontSize: 8, fontFamily: 'monospace', tracking: '0.05em' }}
+            label={{ value: 'EXPECTED ANNUAL RETURN', angle: -90, position: 'insideLeft', offset: 0, fill: C.axis, fontSize: 9, fontFamily: 'monospace', tracking: '0.05em' }}
           />
-          <Tooltip cursor={{ stroke: '#00D4FF', strokeWidth: 0.75, strokeDasharray: '3 3' }} content={<PortfolioTooltip rfRate={result?.rf_rate_used} isSortino={isSortino} />} />
-          
+          <Tooltip cursor={{ stroke: C.cyan, strokeWidth: 0.75, strokeDasharray: '3 3' }} content={<PortfolioTooltip rfRate={result?.rf_rate_used} isSortino={isSortino} />} />
+
           {/* Crosshairs for Optimal Point */}
-          <ReferenceLine x={result.optimal_point.vol} stroke="rgba(0,200,83,0.2)" strokeDasharray="3 3" strokeWidth={0.75} />
-          <ReferenceLine y={result.optimal_point.ret} stroke="rgba(0,200,83,0.2)" strokeDasharray="3 3" strokeWidth={0.75} />
-          
+          <ReferenceLine x={result.optimal_point.vol} stroke={C.emeraldRef} strokeDasharray="3 3" strokeWidth={0.75} />
+          <ReferenceLine y={result.optimal_point.ret} stroke={C.emeraldRef} strokeDasharray="3 3" strokeWidth={0.75} />
+
           {/* Simulated Monte Carlo points */}
-          <Scatter data={visibleMcPoints} fill="rgba(0,190,220,0.20)" isAnimationActive={false} />
+          <Scatter data={visibleMcPoints} fill={C.mcFill} isAnimationActive={false} />
           
           {/* Efficient Frontier Curve - Clickable */}
-          <Scatter 
-            data={result.frontier} 
-            line={{ stroke: '#00D4FF', strokeWidth: 2 }} 
-            fill="none" 
+          <Scatter
+            data={result.frontier}
+            line={{ stroke: C.cyan, strokeWidth: 2 }}
+            fill="none"
             onClick={(e) => {
               if (e && e.activePayload && e.activePayload.length) {
                 const clickedPoint = e.activePayload[0].payload;
@@ -107,20 +108,20 @@ export function FrontierChart({ result, customPoint, onFrontierClick }) {
           />
           
           {/* Individual Stock Points */}
-          <Scatter 
-            data={result.asset_points} 
-            fill="#EF4444"
+          <Scatter
+            data={result.asset_points}
+            fill={C.redAlt}
             shape={(props) => {
               const { cx, cy, payload } = props;
               if (cx === undefined || cy === undefined) return null;
               return (
                 <g key={`asset-${payload.ticker}`}>
-                  <circle cx={cx} cy={cy} r={4.5} fill="#EF4444" stroke="#0C0C0D" strokeWidth={1} />
-                  <text 
-                    x={cx + 6} 
-                    y={cy + 3} 
-                    fill="#888" 
-                    fontSize={8} 
+                  <circle cx={cx} cy={cy} r={4.5} fill={C.redAlt} stroke={C.bg} strokeWidth={1} />
+                  <text
+                    x={cx + 6}
+                    y={cy + 3}
+                    fill={C.axis}
+                    fontSize={9}
                     fontWeight="bold"
                     fontFamily="monospace"
                   >
@@ -132,20 +133,20 @@ export function FrontierChart({ result, customPoint, onFrontierClick }) {
           />
 
           {/* Optimal Portfolio Point */}
-          <Scatter data={[result.optimal_point]} fill="#00C853" />
+          <Scatter data={[result.optimal_point]} fill={C.emerald} />
 
           {/* Custom Point Sight */}
           {customPoint && (
-            <Scatter 
-              data={[customPoint]} 
-              fill="#FFB340"
+            <Scatter
+              data={[customPoint]}
+              fill={C.amber}
               shape={(props) => {
                 const { cx, cy } = props;
                 if (cx === undefined || cy === undefined) return null;
                 return (
                   <g key="custom-sight">
-                    <circle cx={cx} cy={cy} r={7} fill="#FFB340" stroke="#0C0C0D" strokeWidth={1.5} />
-                    <circle cx={cx} cy={cy} r={2} fill="#0C0C0D" />
+                    <circle cx={cx} cy={cy} r={7} fill={C.amber} stroke={C.bg} strokeWidth={1.5} />
+                    <circle cx={cx} cy={cy} r={2} fill={C.bg} />
                   </g>
                 );
               }}

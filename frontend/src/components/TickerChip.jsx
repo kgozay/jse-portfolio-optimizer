@@ -13,8 +13,12 @@ export function TickerChip({ ticker, name, status = 'loading', onRemove }) {
       {status === 'valid' && <span className="text-nb-emerald">✓</span>}
       {status === 'invalid' && <span className="text-nb-red">✕</span>}
       <span>{ticker}</span>
-      {name && <span className="text-nb-dim hidden sm:inline">— {name}</span>}
-      <button onClick={onRemove} className="ml-1 text-nb-dim hover:text-nb-red">×</button>
+      {name && <span className="text-nb-dim truncate max-w-[10rem] sm:max-w-none">— {name}</span>}
+      <button
+        onClick={onRemove}
+        aria-label={`Remove ${ticker} from portfolio`}
+        className="ml-1 text-nb-dim hover:text-nb-red min-w-[24px] min-h-[24px] flex items-center justify-center"
+      >×</button>
     </div>
   );
 }

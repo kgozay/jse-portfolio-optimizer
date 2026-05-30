@@ -3,6 +3,25 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { StageShell } from './StageShell';
 import { Tooltip } from './Tooltip';
 
+const OBJECTIVE_OPTIONS = [
+  ['max_sharpe',    'MAX SHARPE'],
+  ['min_volatility','MIN VOLATILITY'],
+  ['max_sortino',   'MAX SORTINO'],
+];
+
+const PERIOD_OPTIONS = ['1y', '2y', '3y', '5y'];
+
+const ESTIMATOR_OPTIONS = [
+  ['ledoit_wolf', 'LEDOIT-WOLF'],
+  ['sample',      'SAMPLE'],
+];
+
+const SIM_OPTIONS = [
+  [1000,  '1K'],
+  [5000,  '5K'],
+  [10000, '10K'],
+];
+
 export function StageCompute({
   rfData,
   logs,
@@ -101,11 +120,7 @@ export function StageCompute({
                 <Tooltip text="Max Sharpe: maximises return per unit of total risk. Min Volatility: minimises portfolio standard deviation. Max Sortino: maximises return per unit of downside risk only." />
               </span>
               <div className="flex gap-1.5">
-                {[
-                  ['max_sharpe', 'MAX SHARPE'],
-                  ['min_volatility', 'MIN VOLATILITY'],
-                  ['max_sortino', 'MAX SORTINO']
-                ].map(([val, label]) => (
+                {OBJECTIVE_OPTIONS.map(([val, label]) => (
                   <button key={val} onClick={() => setObjective(val)}
                           className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
                             objective === val 
@@ -131,7 +146,7 @@ export function StageCompute({
               <Tooltip text="Years of daily return history to use. Longer periods smooth short-term outliers; shorter periods reflect recent market regime more closely." />
             </span>
             <div className="flex gap-1.5">
-              {['1y','2y','3y','5y'].map(p => (
+              {PERIOD_OPTIONS.map(p => (
                 <button key={p} onClick={() => setPeriod(p)}
                         className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
                           period === p 
@@ -153,10 +168,16 @@ export function StageCompute({
                 {(maxWeight * 100).toFixed(0)}%
               </motion.span>
             </div>
-            <input type="range" min="5" max="100" step="5"
-                   value={maxWeight * 100}
-                   onChange={e => setMaxWeight(parseInt(e.target.value) / 100)}
-                   className="w-full accent-nb-cyan" />
+            <input
+              type="range"
+              min="5"
+              max="100"
+              step="5"
+              value={maxWeight * 100}
+              onChange={e => setMaxWeight(parseInt(e.target.value) / 100)}
+              aria-label={`Maximum weight per holding, currently ${(maxWeight * 100).toFixed(0)}%`}
+              className="w-full accent-nb-cyan"
+            />
           </div>
 
           {/* Covariance estimator */}
@@ -166,7 +187,7 @@ export function StageCompute({
               <Tooltip text="Ledoit-Wolf shrinks the sample covariance matrix to reduce estimation error — recommended for small universes (under 30 stocks). Sample uses raw historical covariance." />
             </span>
             <div className="flex gap-1.5">
-              {[['ledoit_wolf','LEDOIT-WOLF'],['sample','SAMPLE']].map(([val, label]) => (
+              {ESTIMATOR_OPTIONS.map(([val, label]) => (
                 <button key={val} onClick={() => setEstimator(val)}
                         className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
                           estimator === val 
@@ -186,7 +207,7 @@ export function StageCompute({
               <Tooltip text="Number of random portfolios to simulate. Higher counts show a denser frontier cloud but do not change the optimal point. 5K is a good balance of speed and density." />
             </span>
             <div className="flex gap-1.5">
-              {[[1000,'1K'],[5000,'5K'],[10000,'10K']].map(([val, label]) => (
+              {SIM_OPTIONS.map(([val, label]) => (
                 <button key={val} onClick={() => setNSims(val)}
                         className={`font-mono text-[10px] px-2.5 py-1 border transition-all nb-pop-btn ${
                           nSims === val 

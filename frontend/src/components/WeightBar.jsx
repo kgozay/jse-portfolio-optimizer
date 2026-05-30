@@ -17,6 +17,7 @@ export function WeightBar({ ticker, weight, delay = 0, isAdjusting = false, onCh
           step="1"
           value={Math.round(weight * 100)}
           onChange={(e) => onChange(ticker, parseInt(e.target.value) / 100)}
+          aria-label={`${ticker} portfolio weight, currently ${Math.round(weight * 100)}%`}
           className="flex-1 accent-nb-cyan h-2 bg-nb-surface appearance-none outline-none border border-nb-border cursor-ew-resize rounded-none"
           style={{
             background: `linear-gradient(to right, #00D4FF 0%, #00D4FF ${weight * 100}%, #1C1C1E ${weight * 100}%, #1C1C1E 100%)`

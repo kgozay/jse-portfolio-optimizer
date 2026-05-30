@@ -3,6 +3,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer
 } from 'recharts';
+import { C } from '../lib/colours';
 
 function CustomTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
@@ -92,49 +93,49 @@ export function BacktestChart({ backtestResult }) {
           <AreaChart data={chartData} margin={{ top: 12, right: 12, bottom: 8, left: 16 }}>
             <defs>
               <linearGradient id="colorPortfolio" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#00C853" stopOpacity={0.18}/>
-                <stop offset="95%" stopColor="#00C853" stopOpacity={0.005}/>
+                <stop offset="5%" stopColor={C.emerald} stopOpacity={0.18}/>
+                <stop offset="95%" stopColor={C.emerald} stopOpacity={0.005}/>
               </linearGradient>
               <linearGradient id="colorBenchmark" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6E6E73" stopOpacity={0.12}/>
-                <stop offset="95%" stopColor="#6E6E73" stopOpacity={0.005}/>
+                <stop offset="5%" stopColor={C.steel} stopOpacity={0.12}/>
+                <stop offset="95%" stopColor={C.steel} stopOpacity={0.005}/>
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="#191919" strokeDasharray="none" />
-            <XAxis 
-              dataKey="date" 
+            <CartesianGrid stroke={C.grid} strokeDasharray="none" />
+            <XAxis
+              dataKey="date"
               tickFormatter={(d) => {
                 if (!d) return '';
                 const parts = d.split('-');
-                return parts.length >= 2 ? `${parts[0]}-${parts[1]}` : d; // e.g. 2023-05
+                return parts.length >= 2 ? `${parts[0]}-${parts[1]}` : d;
               }}
-              tick={{ fill: '#666', fontSize: 9, fontFamily: 'monospace' }} 
+              tick={{ fill: C.axis, fontSize: 9, fontFamily: 'monospace' }}
               minTickGap={45}
             />
-            <YAxis 
+            <YAxis
               tickFormatter={(v) => `${(v - 100).toFixed(0)}%`}
-              tick={{ fill: '#666', fontSize: 9, fontFamily: 'monospace' }} 
+              tick={{ fill: C.axis, fontSize: 9, fontFamily: 'monospace' }}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#555', strokeWidth: 0.75, strokeDasharray: '3 3' }} />
-            <Area 
-              type="monotone" 
-              dataKey="portfolio" 
-              stroke="#00C853" 
-              strokeWidth={1.5} 
+            <Area
+              type="monotone"
+              dataKey="portfolio"
+              stroke={C.emerald}
+              strokeWidth={1.5}
               fillOpacity={1}
               fill="url(#colorPortfolio)"
-              dot={false} 
+              dot={false}
               activeDot={{ r: 4, strokeWidth: 0 }}
             />
-            <Area 
-              type="monotone" 
-              dataKey="benchmark" 
-              stroke="#6E6E73" 
-              strokeWidth={1.25} 
-              strokeDasharray="4 4" 
+            <Area
+              type="monotone"
+              dataKey="benchmark"
+              stroke={C.steel}
+              strokeWidth={1.25}
+              strokeDasharray="4 4"
               fillOpacity={1}
               fill="url(#colorBenchmark)"
-              dot={false} 
+              dot={false}
               activeDot={{ r: 3, strokeWidth: 0 }}
             />
           </AreaChart>
@@ -142,11 +143,11 @@ export function BacktestChart({ backtestResult }) {
 
         <div className="flex justify-center gap-6 text-[10px] font-mono text-nb-muted mt-2 uppercase tracking-wider">
           <div className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-0.5 bg-[#00C853]"></span>
+            <span className="inline-block w-2.5 h-0.5 bg-nb-emerald"></span>
             <span>Optimised Portfolio Equity Curve</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-0.5 bg-[#6E6E73] border-dashed border-t"></span>
+            <span className="inline-block w-2.5 h-0.5 bg-nb-muted border-dashed border-t"></span>
             <span>Benchmark Curve</span>
           </div>
         </div>

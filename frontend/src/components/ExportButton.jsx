@@ -30,11 +30,13 @@ export function ExportButton({ result }) {
   return (
     <div data-html2canvas-ignore="true" className="flex gap-2 mt-4 pt-4 border-t-2 border-nb-border">
       <button onClick={() => downloadCSV(result)}
+              aria-label="Download portfolio results as CSV"
               className="flex-1 border-2 border-nb-border font-mono text-[9px] tracking-widest
                          py-2 text-nb-muted hover:border-nb-border-bright hover:text-nb-text transition-all nb-pop-btn bg-nb-bg">
         DOWNLOAD CSV
       </button>
       <button onClick={downloadPDF}
+              aria-label="Download portfolio results as PDF"
               className="flex-1 border-2 border-nb-border font-mono text-[9px] tracking-widest
                          py-2 text-nb-muted hover:border-nb-border-bright hover:text-nb-text transition-all nb-pop-btn bg-nb-bg">
         DOWNLOAD PDF

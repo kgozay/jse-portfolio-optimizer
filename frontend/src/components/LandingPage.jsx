@@ -101,7 +101,7 @@ export function LandingPage({ onLaunch }) {
       </div>
 
       {/* Marquee Ticker Tape at Top */}
-      <div className="w-full bg-nb-surface/80 backdrop-blur-md border-b border-nb-border py-2 overflow-hidden relative z-20 flex select-none">
+      <div className="w-full bg-nb-surface border-b border-nb-border py-2 overflow-hidden relative z-20 flex select-none">
         <div className="flex gap-16 animate-marquee whitespace-nowrap pr-16">
           {tickersData.map((item, i) => (
             <span key={`ticker-1-${i}`} className="inline-flex items-center gap-2 font-mono text-[11px] font-bold">

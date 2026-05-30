@@ -6,6 +6,13 @@ import { TickerAutocomplete } from './TickerAutocomplete';
 import { useTickerValidation } from '../hooks/useTickerValidation';
 import { MIN_TICKERS, MAX_TICKERS } from '../lib/constants';
 
+const PRESETS = [
+  { label: 'BLUE CHIPS', tickers: ['NPN', 'SBK', 'SHP', 'MTN', 'BHP'] },
+  { label: 'RESOURCES',  tickers: ['BHP', 'AGL', 'SOL', 'GFI', 'HAR'] },
+  { label: 'FINANCIALS', tickers: ['SBK', 'FSR', 'NED', 'ABG', 'CPI'] },
+  { label: 'CONSUMER',   tickers: ['SHP', 'WHL', 'MRP', 'TFG', 'TRU'] },
+];
+
 export function StageInput({ tickers, setTickers, onOptimise, optimiseDisabled, isActive }) {
   const [input, setInput] = useState('');
 
@@ -40,6 +47,7 @@ export function StageInput({ tickers, setTickers, onOptimise, optimiseDisabled, 
         <button
           onClick={() => setTickers([])}
           disabled={tickers.length === 0}
+          aria-label="Clear all selected tickers"
           className="border border-nb-border font-mono text-[10px] tracking-widest px-3
                      text-nb-dim hover:border-nb-border-bright hover:text-nb-muted
                      disabled:opacity-30 disabled:cursor-not-allowed nb-pop-btn"
@@ -51,20 +59,12 @@ export function StageInput({ tickers, setTickers, onOptimise, optimiseDisabled, 
       {/* Preset Quick-Load Templates */}
       <div className="flex flex-wrap items-center gap-1.5 mb-4 text-[10px] font-mono text-nb-muted">
         <span className="text-[10px] tracking-widest text-nb-dim uppercase mr-1">PRESETS:</span>
-        {[
-          { label: 'BLUE CHIPS', tickers: ['NPN', 'SBK', 'SHP', 'MTN', 'BHP'] },
-          { label: 'RESOURCES', tickers: ['BHP', 'AGL', 'SOL', 'GFI', 'HAR'] },
-          { label: 'FINANCIALS', tickers: ['SBK', 'FSR', 'NED', 'ABG', 'CPI'] },
-          { label: 'CONSUMER', tickers: ['SHP', 'WHL', 'MRP', 'TFG', 'TRU'] },
-        ].map(p => (
+        {PRESETS.map(p => (
           <button
             key={p.label}
+            aria-label={`Load ${p.label} preset: ${p.tickers.join(', ')}`}
             onClick={() => {
-              const newTickers = p.tickers.map(tick => ({
-                ticker: tick,
-                name: null,
-                status: 'loading'
-              }));
+              const newTickers = p.tickers.map(tick => ({ ticker: tick, name: null, status: 'loading' }));
               setTickers(newTickers);
               newTickers.forEach(t => validate(t.ticker));
             }}

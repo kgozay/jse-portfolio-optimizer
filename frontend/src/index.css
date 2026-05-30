@@ -88,6 +88,13 @@
   .nb-pop-btn { transition: none; }
   .nb-pop-card { transition: none; }
   .cursor { animation: none; opacity: 1; }
+  .nb-shiny-text {
+    animation: none;
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: #A0A0A5;
+    background-clip: unset;
+  }
 }
 
 /* Sleek, hardware-accelerated text shimmer animation */

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { C } from '../lib/colours';
 
 export function CorrelationMatrix({ result }) {
   const [hoveredCell, setHoveredCell] = useState(null);
@@ -21,19 +22,17 @@ export function CorrelationMatrix({ result }) {
   // Helper to get background color based on correlation strength
   const getCellColorStyle = (val, isSelf) => {
     if (isSelf) {
-      return { backgroundColor: '#141415', border: '1px solid #00D4FF', color: '#00D4FF' };
+      return { backgroundColor: '#141415', border: `1px solid ${C.cyan}`, color: C.cyan };
     }
-    
-    // Positive correlation: shade of emerald green
+
     if (val > 0) {
-      return { 
+      return {
         backgroundColor: `rgba(0, 200, 83, ${Math.min(1.0, val * 0.95 + 0.05)})`,
         color: val > 0.5 ? '#000000' : '#E0E0E2'
       };
     }
-    
-    // Negative correlation: shade of red
-    return { 
+
+    return {
       backgroundColor: `rgba(255, 69, 58, ${Math.min(1.0, Math.abs(val) * 0.95 + 0.05)})`,
       color: Math.abs(val) > 0.5 ? '#000000' : '#E0E0E2'
     };
@@ -78,7 +77,7 @@ export function CorrelationMatrix({ result }) {
                     style={style}
                     onMouseEnter={() => setHoveredCell({ t1, t2, val })}
                     onMouseLeave={() => setHoveredCell(null)}
-                    className={`w-10 h-10 flex items-center justify-center font-mono text-[8.5px] cursor-crosshair transition-all duration-100 border border-nb-bg/10 ${
+                    className={`w-10 h-10 flex items-center justify-center font-mono text-[11px] cursor-crosshair transition-all duration-100 border border-nb-bg/10 ${
                       isHovered ? 'ring-2 ring-nb-cyan z-10 scale-[1.05]' : ''
                     }`}
                   >

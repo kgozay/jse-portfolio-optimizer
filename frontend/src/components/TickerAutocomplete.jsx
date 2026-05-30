@@ -69,6 +69,9 @@ export function TickerAutocomplete({ value, onChange, onSelect, disabled }) {
         onBlur={() => setTimeout(() => { setFocused(false); setActiveIndex(-1); }, 150)}
         disabled={disabled}
         placeholder="TICKER OR COMPANY NAME"
+        aria-label="Search JSE ticker or company name"
+        aria-autocomplete="list"
+        aria-expanded={suggestions.length > 0}
         className="w-full bg-transparent border border-nb-border font-mono text-xs
                    tracking-widest px-3 py-2.5 text-nb-text placeholder:text-nb-dim
                    focus:border-nb-cyan outline-none disabled:opacity-30"
@@ -83,6 +86,7 @@ export function TickerAutocomplete({ value, onChange, onSelect, disabled }) {
               <button
                 key={s.ticker}
                 onMouseDown={() => { onSelect(s.ticker, s.name); setSuggestions([]); }}
+                aria-label={`Add ${s.ticker} — ${s.name}`}
                 className={`w-full flex items-center justify-between text-left px-3 py-2 font-mono text-xs transition-colors ${
                   isActive ? 'bg-nb-border text-nb-cyan font-bold' : 'text-nb-muted hover:bg-nb-border hover:text-nb-text'
                 }`}
