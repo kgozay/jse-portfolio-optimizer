@@ -23,7 +23,7 @@ SECTOR_MAP = {
     "PSG": "Financials", "JSE": "Financials", "SNT": "Financials",
 
     # Resources
-    "AGL": "Resources", "BHP": "Resources", "SOL": "Resources",
+    "AGL": "Resources", "SOL": "Resources",
     "SAP": "Resources", "SSW": "Resources", "IMP": "Resources",
     "GFI": "Resources", "HAR": "Resources", "AMS": "Resources",
     "EXX": "Resources", "KIO": "Resources", "CFR": "Resources",

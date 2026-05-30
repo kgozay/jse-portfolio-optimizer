@@ -35,10 +35,14 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str,
         benchmark_aligned = (1 + eq_returns).cumprod() * 100
     else:
         symbol = "^J203.JO" if benchmark == "J203" else "^J200.JO"
+        # yf.download only accepts: 1d 5d 1mo 3mo 6mo 1y 2y 5y 10y ytd max
+        # Map lookback periods that aren't in that set to the nearest valid option
+        _period_map = {"3y": "5y", "4y": "5y"}
+        dl_period = _period_map.get(period, period)
         try:
             raw = await loop.run_in_executor(
                 None,
-                lambda: yf.download(symbol, period=period, auto_adjust=True, progress=False, group_by="ticker")
+                lambda: yf.download(symbol, period=dl_period, auto_adjust=True, progress=False, group_by="ticker")
             )
             series = extract_close(raw)
             if series is not None and len(series) > 0:
@@ -51,7 +55,7 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str,
             try:
                 raw = await loop.run_in_executor(
                     None,
-                    lambda: yf.download("EZA", period=period, auto_adjust=True, progress=False, group_by="ticker")
+                    lambda: yf.download("EZA", period=dl_period, auto_adjust=True, progress=False, group_by="ticker")
                 )
                 series = extract_close(raw)
                 if series is not None and len(series) > 0:
@@ -59,8 +63,9 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str,
             except Exception:
                 pass
 
-        # Fallback: daily compound return at 8% annualised
-        if benchmark_curve is None:
+        # Fallback: daily compound return at 8% annualised; beta is not meaningful here
+        using_synthetic_benchmark = benchmark_curve is None
+        if using_synthetic_benchmark:
             n_days = len(portfolio_curve)
             daily_rate = (1 + 0.08) ** (1 / 252) - 1
             compounded = (1 + daily_rate) ** np.arange(n_days)
@@ -87,15 +92,18 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str,
     sortino_ratio = (ann_return - rf_rate) / downside_deviation if downside_deviation > 0 else 0.0
     
     # Calculate Portfolio Beta relative to the Benchmark
-    benchmark_returns = benchmark_aligned.pct_change().dropna()
-    aligned_df = pd.DataFrame({"port": portfolio_returns, "bench": benchmark_returns}).dropna()
-    if len(aligned_df) > 1:
-        cov_matrix = aligned_df.cov()
-        cov_pb = cov_matrix.loc["port", "bench"]
-        var_b = cov_matrix.loc["bench", "bench"]
-        beta = float(cov_pb / var_b) if var_b > 1e-8 else 1.0
-    else:
-        beta = 1.0
+    # Beta is not meaningful against the synthetic 8% fallback (constant returns, zero variance)
+    using_synthetic = using_synthetic_benchmark if benchmark != "EQUAL_WEIGHT" else False
+    beta = None
+    if not using_synthetic:
+        benchmark_returns = benchmark_aligned.pct_change().dropna()
+        aligned_df = pd.DataFrame({"port": portfolio_returns, "bench": benchmark_returns}).dropna()
+        if len(aligned_df) > 1:
+            cov_matrix = aligned_df.cov()
+            cov_pb = cov_matrix.loc["port", "bench"]
+            var_b = cov_matrix.loc["bench", "bench"]
+            if var_b > 1e-8:
+                beta = round(float(cov_pb / var_b), 2)
         
     return {
         "dates": portfolio_curve.index.strftime("%Y-%m-%d").tolist(),
@@ -106,5 +114,5 @@ async def compute_equity_curve(prices: pd.DataFrame, weights: dict, period: str,
         "alpha_pct": round(port_ret - bench_ret, 2),
         "max_drawdown_pct": round(max_drawdown, 2),
         "sortino_ratio": round(sortino_ratio, 2),
-        "beta": round(beta, 2),
+        "beta": beta,
     }

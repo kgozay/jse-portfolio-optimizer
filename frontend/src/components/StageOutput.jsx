@@ -430,7 +430,7 @@ export function StageOutput({ result, runId, backtestResult, backtestStatus, isA
                 <div className="space-y-1">
                   <div className="font-mono text-[9px] text-nb-dim uppercase tracking-wide">Market Sensitivity (β)</div>
                   <div className="font-mono text-base text-nb-cyan font-bold">
-                    {backtestResult?.beta !== undefined ? backtestResult.beta.toFixed(2) : 'N/A'}
+                    {backtestResult?.beta != null ? backtestResult.beta.toFixed(2) : 'N/A'}
                   </div>
                   <div className="font-mono text-[11px] text-nb-dim">how much portfolio moves vs. the JSE</div>
                 </div>

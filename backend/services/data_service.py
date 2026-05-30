@@ -112,7 +112,6 @@ JSE_TICKERS = {
     # Original 39
     "NPN": "Naspers Limited",
     "PRX": "Prosus NV",
-    "BHP": "BHP Group Limited",
     "AGL": "Anglo American PLC",
     "SOL": "Sasol Limited",
     "SBK": "Standard Bank Group",
